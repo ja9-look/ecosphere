@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
           const challengeId = challengeResponse.data?.challengeId;
 
           console.log("challengeId: ", challengeId);
-          // Return user object
+
           return {
             id: credentials.email,
             userId: credentials.email,
@@ -68,7 +68,65 @@ export const authOptions: NextAuthOptions = {
         }
       },
     }),
-    // Add sign in provider here (similar to sign up)
+    CredentialsProvider({
+      id: "SignIn",
+      name: "SignIn",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials, req) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+        try {
+          await client.getUser({
+            userId: credentials.email,
+          });
+
+          const tokenResponse = await client.createUserToken({
+            userId: credentials.email,
+          });
+
+          const userToken = tokenResponse.data?.userToken;
+          const encryptionKey = tokenResponse.data?.encryptionKey;
+
+          console.log("userToken: ", userToken);
+          console.log("encryptionKey: ", encryptionKey);
+
+          if (!userToken || !encryptionKey) {
+            return null;
+          }
+
+          const challengeResponse = await client.createUserPinWithWallets({
+            userToken,
+            blockchains: ["AVAX-FUJI"],
+          });
+
+          const challengeId = challengeResponse.data?.challengeId;
+
+          console.log("challengeId: ", challengeId);
+
+          return {
+            id: credentials.email,
+            userId: credentials.email,
+            email: credentials.email,
+            userToken,
+            encryptionKey,
+            challengeId,
+          };
+        } catch (error: any) {
+          console.error("Circle integration error:", error);
+          if (error.response) {
+            console.error(
+              "Error details:",
+              JSON.stringify(error.response.data, null, 2)
+            );
+          }
+          return null;
+        }
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, user }) {
@@ -97,5 +155,5 @@ export const authOptions: NextAuthOptions = {
 };
 
 export async function validOnboardStatus(session: any) {
-  return !session?.user?.challengeId;
+  return session?.user?.challengeId;
 }

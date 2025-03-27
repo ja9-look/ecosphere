@@ -1,4 +1,3 @@
-// src/app/signup/page.tsx
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { AuthForm } from "../../../components/auth/AuthForm";
@@ -8,7 +7,7 @@ export default async function SignUpPage() {
   const session = await getServerSession(authOptions);
 
   if (session && (await validOnboardStatus(session))) {
-    redirect("/wallets");
+    redirect("/dashboard");
   }
 
   if (session && !(await validOnboardStatus(session))) {

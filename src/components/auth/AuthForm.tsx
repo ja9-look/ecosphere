@@ -43,7 +43,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
   const { client, isInitialized } = useW3sContext();
   const { data: session, status: sessionStatus } = useSession();
 
-  // Handle redirect and PIN setup
   useEffect(() => {
     if (redirect && session && client && sessionStatus === "authenticated") {
       if (session.user?.challengeId) {
@@ -70,6 +69,9 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
         if (response?.ok) {
           setRedirect(true);
         } else if (response?.error) {
+          console.log(response);
+          console.log(client);
+          
           setFormMessage(response.error);
         } else {
           setFormMessage("Error occurred on sign up - please try again.");

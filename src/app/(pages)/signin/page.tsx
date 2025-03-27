@@ -1,4 +1,3 @@
-// src/app/signup/page.tsx
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { AuthForm } from "../../../components/auth/AuthForm";
