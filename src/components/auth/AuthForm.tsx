@@ -7,7 +7,10 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { signIn, useSession } from "next-auth/react";
 import * as yup from "yup";
-import { useW3sProvider } from "../../providers/W3sProvider";
+import { useW3sContext } from "../../providers/W3sProvider";
+import { TextField } from "../TextField";
+import { Typography, Button, IconButton } from "@mui/joy";
+import "./AuthForm.css";
 
 const formSchema = yup.object({
   email: yup
@@ -36,7 +39,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
   const [formMessage, setFormMessage] = useState<string | undefined>(undefined);
   const [redirect, setRedirect] = useState<boolean>(false);
   const router = useRouter();
-  const { client } = useW3sProvider();
+  const { client } = useW3sContext();
   const { data: session } = useSession();
 
   useEffect(() => {
@@ -56,7 +59,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
     }
   }, [redirect, session, client]);
 
-  const onSubmit = SubmitHandler<FormInputs>(async (data: any) => {
+  const onSubmit: SubmitHandler<FormInputs> = async (data: any) => {
     setLoading(true);
     if (!isSignIn) {
       const response = await signIn("SignUp", {
@@ -70,7 +73,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
       } else if (response?.error) {
         setFormMessage(response.error);
       } else {
-        setFormMessage("SError occurred on sign up - please try again.");
+        setFormMessage("Error occurred on sign up - please try again.");
       }
       setLoading(false);
     } else {
@@ -87,16 +90,17 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
       }
       setLoading(false);
     }
+  };
 
-    return (
-      <div>
+  return (
+    <div className="auth-form-container">
+      <div className="auth-form">
         <Image
           src="/ecosphere_logo.png"
           alt="ecosphere logo"
           width={200}
           height={200}
         />
-        <h1>{isSignIn ? "Sign In" : "Sign Up"}</h1>
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
             placeholder="Email"
@@ -111,27 +115,35 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
             error={formState.errors.password ? true : false}
             helperText={formState.errors.password?.message}
             endDecorator={
-              <Button
-                variant="link"
-                onClick={() => setIsMasked(!isMasked)}
-              >
+              <IconButton onClick={() => setIsMasked(!isMasked)}>
                 {isMasked ? "Show" : "Hide"}
-              </Button>
+              </IconButton>
             }
             {...register("password")}
           />
           <Button
+            className="auth-form-button"
             type="submit"
-            variant="primary"
-            size="lg"
-            isLoading={loading}
+            variant="solid"
+            size="md"
+            loading={loading}
             disabled={loading}
           >
             {isSignIn ? "Sign In" : "Sign Up"}
           </Button>
           {formMessage && <p>{formMessage}</p>}
+          <Typography>
+            {isSignIn ? "Don't have an account?" : "Already have an account?"}
+            <Button
+              className="auth-form-button-link"
+              variant="plain"
+              onClick={() => router.push(isSignIn ? "/signup" : "/signin")}
+            >
+              {isSignIn ? "Sign Up" : "Sign In"}
+            </Button>
+          </Typography>
         </form>
       </div>
-    );
-  });
+    </div>
+  );
 };

@@ -1,6 +1,7 @@
 import ax, { AxiosError } from "axios";
 import { getSession, signOut } from "next-auth/react";
 
+console.log("next base url: ", process.env.NEXT_PUBLIC_BASE_URL);
 const axios = ax.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   headers: {
