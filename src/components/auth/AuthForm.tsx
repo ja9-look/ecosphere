@@ -10,7 +10,8 @@ import * as yup from "yup";
 import { useW3sContext } from "../../providers/W3sProvider";
 import { TextField } from "../TextField";
 import { Typography, Button, IconButton } from "@mui/joy";
-import "./AuthForm.css";
+import styles from "./AuthForm.module.css";
+import Link from "next/link";
 
 const formSchema = yup.object({
   email: yup
@@ -39,68 +40,71 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
   const [formMessage, setFormMessage] = useState<string | undefined>(undefined);
   const [redirect, setRedirect] = useState<boolean>(false);
   const router = useRouter();
-  const { client } = useW3sContext();
-  const { data: session } = useSession();
+  const { client, isInitialized } = useW3sContext();
+  const { data: session, status: sessionStatus } = useSession();
 
+  // Handle redirect and PIN setup
   useEffect(() => {
-    if (redirect && session && client) {
-      if (session.user.challengeId) {
-        client.execute(session.user.challengeId, (error: any, result: any) => {
-          if (error) {
-            setFormMessage("Error occurred on PIN setup - please try again.");
-          } else if (result) {
-            router.push("/dashboard");
-          }
-        });
+    if (redirect && session && client && sessionStatus === "authenticated") {
+      if (session.user?.challengeId) {
+        router.push("/setup-pin");
       } else {
         router.push("/dashboard");
       }
       setLoading(false);
     }
-  }, [redirect, session, client]);
+  }, [redirect, session, client, sessionStatus, router]);
 
   const onSubmit: SubmitHandler<FormInputs> = async (data: any) => {
     setLoading(true);
-    if (!isSignIn) {
-      const response = await signIn("SignUp", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
+    setFormMessage(undefined);
 
-      if (response?.ok) {
-        setRedirect(true);
-      } else if (response?.error) {
-        setFormMessage(response.error);
-      } else {
-        setFormMessage("Error occurred on sign up - please try again.");
-      }
-      setLoading(false);
-    } else {
-      const response = await signIn("SignIn", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
+    try {
+      if (!isSignIn) {
+        const response = await signIn("SignUp", {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        });
 
-      if (response?.ok) {
-        setRedirect(true);
+        if (response?.ok) {
+          setRedirect(true);
+        } else if (response?.error) {
+          setFormMessage(response.error);
+        } else {
+          setFormMessage("Error occurred on sign up - please try again.");
+        }
       } else {
-        setFormMessage("Invalid credentials");
+        const response = await signIn("SignIn", {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        });
+
+        if (response?.ok) {
+          setRedirect(true);
+        } else {
+          setFormMessage("Invalid credentials");
+        }
       }
+    } catch (error: any) {
+      setFormMessage(error.message || "An unexpected error occurred");
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-form-container">
-      <div className="auth-form">
-        <Image
-          src="/ecosphere_logo.png"
-          alt="ecosphere logo"
-          width={200}
-          height={200}
-        />
+    <div className={styles.authFormContainer}>
+      <div className={styles.authForm}>
+        <Link href="/">
+          <Image
+            src="/ecosphere_logo.png"
+            alt="ecosphere logo"
+            width={200}
+            height={200}
+          />
+        </Link>
         <form onSubmit={handleSubmit(onSubmit)}>
           <TextField
             placeholder="Email"
@@ -122,7 +126,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
             {...register("password")}
           />
           <Button
-            className="auth-form-button"
+            className={styles.authFormButton}
             type="submit"
             variant="solid"
             size="md"
@@ -131,11 +135,18 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
           >
             {isSignIn ? "Sign In" : "Sign Up"}
           </Button>
-          {formMessage && <p>{formMessage}</p>}
-          <Typography>
+          {formMessage && (
+            <Typography
+              color="danger"
+              mt={2}
+            >
+              {formMessage}
+            </Typography>
+          )}
+          <Typography mt={2}>
             {isSignIn ? "Don't have an account?" : "Already have an account?"}
             <Button
-              className="auth-form-button-link"
+              className={styles.authFormButtonLink}
               variant="plain"
               onClick={() => router.push(isSignIn ? "/signup" : "/signin")}
             >

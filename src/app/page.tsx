@@ -1,8 +1,8 @@
 import Image from "next/image";
 import styles from "./page.module.css";
 import Typography from "@mui/material/Typography";
-import { AuthForm } from "../components/auth/AuthForm";
 import { Button } from "@mui/joy";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -15,24 +15,26 @@ export default function Home() {
           width={200}
           height={200}
         />
-        <Typography variant="h4">
-          sustainable · transparent · decentralized
-        </Typography>
+        <h4>sustainable · transparent · decentralized</h4>
         <div className={styles.ctas}>
-          <Button
-            className={styles.signin}
-            variant="solid"
-            size="lg"
-          >
-            Sign In
-          </Button>
-          <Button
-            className={styles.signup}
-            variant="plain"
-            size="lg"
-          >
-            Sign Up
-          </Button>
+          <Link href="/signin">
+            <Button
+              className={styles.signin}
+              variant="solid"
+              size="lg"
+            >
+              Sign In
+            </Button>
+          </Link>
+          <Link href="/signup">
+            <Button
+              className={styles.signup}
+              variant="plain"
+              size="lg"
+            >
+              Sign Up
+            </Button>
+          </Link>
         </div>
       </div>
       <footer className={styles.footer}>

@@ -1,83 +1,42 @@
-// Copyright (c) 2024, Circle Technologies, LLC. All rights reserved.
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 "use client";
-import { restorePinHelper } from "../axios/users";
+
 import { W3SSdk } from "@circle-fin/w3s-pw-web-sdk";
-import { useSession } from "next-auth/react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
-const appId = process.env.NEXT_PUBLIC_APP_ID ?? "";
-
-interface ContextState {
-  client: W3SSdk | undefined;
+interface W3sContextType {
+  client: W3SSdk | null;
+  isInitialized: boolean;
 }
 
-const W3sContext = createContext<ContextState>({ client: undefined });
+const W3sContext = createContext<W3sContextType>({
+  client: null,
+  isInitialized: false,
+});
 
-export interface W3sProviderProps {
-  children?: React.ReactNode;
-}
+export const useW3sContext = () => useContext(W3sContext);
 
-export const W3sProvider: React.FC<W3sProviderProps> = ({ children }) => {
-  const [client, setClient] = useState<W3SSdk | undefined>(undefined);
-  const { data: session } = useSession();
+export function W3sProvider({ children }: { children: React.ReactNode }) {
+  const [client, setClient] = useState<W3SSdk | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (client) {
-      client.setResources({
-        fontFamily: {
-          name: "Inter",
-          url: "https://fonts.cdnfonts.com/css/inter",
-        },
+    if (typeof window === "undefined" || client) return;
+
+    try {
+      const sdk = new W3SSdk();
+      sdk.setAppSettings({
+        appId: process.env.NEXT_PUBLIC_CIRCLE_APP_ID || "",
       });
+      setClient(sdk);
+      setIsInitialized(true);
+    } catch (error) {
+      console.error("Failed to initialize W3S SDK:", error);
     }
   }, [client]);
-
-  useEffect(() => {
-    if (!client) {
-      const webClient = new W3SSdk();
-      webClient?.setAppSettings({
-        appId,
-      });
-      webClient?.setOnForgotPin(async () => {
-        const challengeId = await restorePinHelper();
-        if (challengeId) {
-          webClient.execute(challengeId);
-        }
-      });
-      setClient(webClient);
-    }
-  }, [client]);
-
-  useEffect(() => {
-    if (client && session) {
-      const currUser = session.user;
-      client.setAuthentication({
-        userToken: currUser.userToken,
-        encryptionKey: currUser.encryptionKey,
-      });
-    }
-  }, [client, session]);
 
   return (
-    <W3sContext.Provider value={{ client }}>{children}</W3sContext.Provider>
+    <W3sContext.Provider value={{ client, isInitialized }}>
+      {children}
+    </W3sContext.Provider>
   );
-};
-
-export const useW3sContext = () => {
-  return useContext(W3sContext);
-};
+}

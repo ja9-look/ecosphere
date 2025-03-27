@@ -15,8 +15,8 @@ async function main() {
 
   const defaultTokenAddresses: { [key: string]: string } = {
     localhost: "",
-    sepolia: process.env.USDC_ADDRESS_SEPOLIA || "",
-    polygon_amoy: process.env.USDC_ADDRESS_AMOY || "",
+    baseSepolia: process.env.USDC_ADDRESS_BASE_SEPOLIA || "",
+    fuji: process.env.USDC_ADDRESS_FUJI || "",
   };
 
   let usdcAddress = defaultTokenAddresses[network];
@@ -28,7 +28,6 @@ async function main() {
     const MockUSDC = await ethers.getContractFactory("MockUSDC");
     const mockUSDCFactory = MockUSDC.connect(deployer);
     const mockUSDC = await mockUSDCFactory.deploy();
-    await mockUSDC.waitForDeployment();
     finalUsdcAddress = await mockUSDC.getAddress();
     console.log(`MockUSDC deployed to: ${finalUsdcAddress}`);
   } else {
@@ -43,7 +42,6 @@ async function main() {
   const CarbonCredit = await ethers.getContractFactory("CarbonCredit");
   const carbonCreditFactory = CarbonCredit.connect(deployer);
   const carbonCredit = await carbonCreditFactory.deploy(finalUsdcAddress);
-  await carbonCredit.waitForDeployment();
   const carbonCreditAddress = await carbonCredit.getAddress();
   console.log(`CarbonCredit deployed to: ${carbonCreditAddress}`);
 
@@ -56,7 +54,6 @@ async function main() {
     carbonCreditAddress,
     finalUsdcAddress
   );
-  await carbonMarketplace.waitForDeployment();
   const carbonMarketplaceAddress = await carbonMarketplace.getAddress();
   console.log(`CarbonMarketplace deployed to: ${carbonMarketplaceAddress}`);
 
