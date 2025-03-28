@@ -5,7 +5,6 @@ import "dotenv/config";
 
 async function main() {
   console.log("Deploying Carbon Credit Marketplace contracts...");
-
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
   console.log(`Deploying contracts with account: ${deployerAddress}`);
@@ -15,7 +14,7 @@ async function main() {
 
   const defaultTokenAddresses: { [key: string]: string } = {
     localhost: "",
-    baseSepolia: process.env.USDC_ADDRESS_BASE_SEPOLIA || "",
+    sepolia: process.env.USDC_ADDRESS_SEPOLIA || "",
     fuji: process.env.USDC_ADDRESS_FUJI || "",
   };
 

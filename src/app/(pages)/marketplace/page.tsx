@@ -1,11 +1,10 @@
-import React from "react";
 import Navbar from "../../../components/navbar/Navbar";
 
-export default async function Dashboard() {
+export default function Marketplace() {
   return (
     <div>
       <Navbar />
-      <h1>Dashboard</h1>
+      <h1>Marketplace</h1>
     </div>
   );
 }

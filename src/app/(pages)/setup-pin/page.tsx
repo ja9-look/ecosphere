@@ -31,16 +31,25 @@ export default function SetupPinPage() {
       encryptionKey: session.user.encryptionKey,
     });
 
-    client.execute(session.user.challengeId, (error, result) => {
+    client.execute(session.user.challengeId, async (error, result) => {
       if (error) {
-        console.error("PIN setup error:", error);
         setError(`Error: ${error.message || "PIN setup failed"}`);
         return;
-      } else if (result) {
-        router.push("/dashboard");
+      }
+
+      if (result) {
+        try {
+          await fetch("/api/user/onboarding", {
+            method: "POST",
+          });
+
+          router.push("/dashboard");
+        } catch (err) {
+          setError("Failed to complete onboarding");
+        }
       }
     });
-  }, [session, status, client, isInitialized, router]);
+  }, [session, client, isInitialized, router]);
 
   if (status === "loading" || !isInitialized) {
     return (

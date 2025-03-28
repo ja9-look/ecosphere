@@ -15,9 +15,10 @@ const config: HardhatUserConfig = {
     target: "ethers-v6",
   },
   networks: {
-    baseSepolia: {
-      url: "https://sepolia.base.org",
+    sepolia: {
+      url: `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
       accounts: [process.env.PRIVATE_KEY || ""],
+      chainId: 11155111,
     },
     fuji: {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
@@ -32,16 +33,25 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      baseSepolia: "PLACEHOLDER",
+      sepolia: process.env.ETHERSCAN_API_KEY || "",
       avalancheFujiTestnet: process.env.SNOWTRACE_API_KEY || "",
     },
     customChains: [
       {
-        network: "baseSepolia",
-        chainId: 84532,
+        network: "sepolia",
+        chainId: 11155111,
         urls: {
-          apiURL: "https://api-sepolia.basescan.org/api",
-          browserURL: "https://sepolia.basescan.org",
+          apiURL: "https://api-sepolia.etherscan.io/api",
+          browserURL: "https://sepolia.etherscan.io",
+        },
+      },
+      {
+        network: "avalancheFujiTestnet",
+        chainId: 43113,
+        urls: {
+          apiURL:
+            "https://api.routescan.io/v2/network/testnet/evm/43113/etherscan",
+          browserURL: "https://avalanche.testnet.routescan.io",
         },
       },
     ],

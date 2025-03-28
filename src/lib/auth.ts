@@ -1,12 +1,17 @@
+// lib/auth.ts
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { initiateUserControlledWalletsClient } from "@circle-fin/user-controlled-wallets";
+import bcrypt from "bcrypt";
+import prisma from "./prisma";
 
 const client = initiateUserControlledWalletsClient({
   apiKey: process.env.CIRCLE_API_KEY || "",
 });
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       id: "SignUp",
@@ -21,6 +26,16 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (existingUser) {
+            throw new Error("Email already in use.");
+          }
+
+          const hashedPassword = await bcrypt.hash(credentials.password, 10);
+
           await client.createUser({
             userId: credentials.email,
           });
@@ -32,39 +47,36 @@ export const authOptions: NextAuthOptions = {
           const userToken = tokenResponse.data?.userToken;
           const encryptionKey = tokenResponse.data?.encryptionKey;
 
-          console.log("userToken: ", userToken);
-          console.log("encryptionKey: ", encryptionKey);
-
           if (!userToken || !encryptionKey) {
             return null;
           }
 
           const challengeResponse = await client.createUserPinWithWallets({
             userToken,
-            blockchains: ["AVAX-FUJI"],
+            blockchains: ["AVAX-FUJI", "ETH-SEPOLIA"],
           });
 
           const challengeId = challengeResponse.data?.challengeId;
 
-          console.log("challengeId: ", challengeId);
+          const user = await prisma.user.create({
+            data: {
+              email: credentials.email,
+              password: hashedPassword,
+              circleUserId: credentials.email,
+            },
+          });
 
           return {
-            id: credentials.email,
-            userId: credentials.email,
-            email: credentials.email,
+            id: user.id,
+            userId: user.circleUserId,
+            email: user.email,
             userToken,
             encryptionKey,
             challengeId,
           };
         } catch (error: any) {
           console.error("Circle integration error:", error);
-          if (error.response) {
-            console.error(
-              "Error details:",
-              JSON.stringify(error.response.data, null, 2)
-            );
-          }
-          return null;
+          throw new Error(error.message || "An error occurred during sign up");
         }
       },
     }),
@@ -80,50 +92,62 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
         try {
-          await client.getUser({
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (!user || !user.password) {
+            return null;
+          }
+
+          const passwordMatch = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          if (!passwordMatch) {
+            return null;
+          }
+
+          const tokenResponse = await client.createUserToken({
             userId: credentials.email,
           });
 
-          const tokenResponse = await client.createUserToken({
+          const userResponse = await client.getUser({
             userId: credentials.email,
           });
 
           const userToken = tokenResponse.data?.userToken;
           const encryptionKey = tokenResponse.data?.encryptionKey;
 
-          console.log("userToken: ", userToken);
-          console.log("encryptionKey: ", encryptionKey);
+          let challengeId: string | undefined;
+          if (
+            userResponse.data?.user.status !== "ENABLED" &&
+            userResponse.data?.user.pinStatus !== "ENABLED"
+          ) {
+            if (!userToken || !encryptionKey) {
+              return null;
+            }
 
-          if (!userToken || !encryptionKey) {
-            return null;
+            const challengeResponse = await client.createUserPinWithWallets({
+              userToken,
+              blockchains: ["AVAX-FUJI"],
+            });
+
+            challengeId = challengeResponse.data?.challengeId;
           }
 
-          const challengeResponse = await client.createUserPinWithWallets({
-            userToken,
-            blockchains: ["AVAX-FUJI"],
-          });
-
-          const challengeId = challengeResponse.data?.challengeId;
-
-          console.log("challengeId: ", challengeId);
-
           return {
-            id: credentials.email,
-            userId: credentials.email,
-            email: credentials.email,
+            id: user.id,
+            userId: user.circleUserId,
+            email: user.email,
             userToken,
             encryptionKey,
-            challengeId,
+            challengeId: challengeId,
           };
         } catch (error: any) {
           console.error("Circle integration error:", error);
-          if (error.response) {
-            console.error(
-              "Error details:",
-              JSON.stringify(error.response.data, null, 2)
-            );
-          }
-          return null;
+          throw new Error(error.message || "An error occurred during sign in");
         }
       },
     }),
