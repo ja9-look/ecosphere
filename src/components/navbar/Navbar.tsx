@@ -19,6 +19,7 @@ export const Navbar: React.FC = () => {
   const authenticatedItems: NavItem[] = [
     { label: "Dashboard", href: "/dashboard" },
     { label: "Marketplace", href: "/marketplace" },
+    { label: "My Carbon Credits", href: "/carbon-credits" },
     { label: "My Wallets", href: "/wallets" },
   ];
 

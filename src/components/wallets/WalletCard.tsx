@@ -10,7 +10,7 @@ import {
 
 export interface WalletCardProps {
   key: string;
-  walletId: string;
+  id: string;
   address: string;
   blockchain: string;
   balances: {
@@ -28,20 +28,23 @@ export interface WalletCardProps {
 
 export default function WalletCard({
   key,
-  walletId,
+  id,
   address,
   blockchain,
   balances,
   isLoading,
 }: WalletCardProps) {
   return (
-    <Card key={key}>
+    <Card
+      key={key}
+      sx={{ width: 400, height: 500, marginBottom: 2 }}
+    >
       <CardContent>
         <Typography
           variant="h6"
           gutterBottom
         >
-          Wallet Id: {walletId}
+          Wallet Id: {id}
         </Typography>
         <Typography
           variant="body2"
