@@ -16,12 +16,12 @@ const config: HardhatUserConfig = {
   },
   networks: {
     sepolia: {
-      url: `https://sepolia.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      url: `${process.env.RPC_URL_SEPOLIA}${process.env.INFURA_API_KEY}`,
       accounts: [process.env.PRIVATE_KEY || ""],
       chainId: 11155111,
     },
     fuji: {
-      url: "https://api.avax-test.network/ext/bc/C/rpc",
+      url: `${process.env.RPC_URL_FUJI}`,
       accounts: [process.env.PRIVATE_KEY || ""],
       chainId: 43113,
     },

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
-import { Box, Button, Container, Sheet, Typography, useTheme } from "@mui/joy";
+import { Box, Button, Container, Sheet, Typography } from "@mui/joy";
 
 interface NavItem {
   label: string;
@@ -37,7 +37,7 @@ export const Navbar: React.FC = () => {
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "space-around",
               alignItems: "center",
               minHeight: "64px",
             }}

@@ -27,15 +27,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
           size="lg"
           {...props}
         />
-        <FormHelperText>
-          {/* {props.error && ( 
-            <InformationCircleIcon
-              width={20}
-              className="text-red"
-            />
-          )} */}
-          {helperText}
-        </FormHelperText>
+        <FormHelperText>{helperText}</FormHelperText>
       </FormControl>
     );
   }
