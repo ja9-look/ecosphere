@@ -65,6 +65,7 @@ export default function CarbonCredits() {
         sx={{
           display: "flex",
           flexDirection: "row",
+          flexWrap: "wrap",
           gap: 4,
           padding: 8,
           justifyContent: "center",
@@ -89,7 +90,7 @@ export default function CarbonCredits() {
         )}
         {loading && <CircularProgress size={20} />}
         {carbonCredits.length > 0 &&
-          carbonCredits.map((credit) => (
+          [...carbonCredits].reverse().map((credit) => (
             <div key={credit.tokenId}>
               <CarbonCreditCard
                 id={credit.tokenId}
@@ -104,6 +105,19 @@ export default function CarbonCredits() {
               />
             </div>
           ))}
+        {carbonCredits.length === 0 && !loading && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <h3>No carbon credits found</h3>
+            <p>Browse our Marketplace to buy your first carbon credit!</p>
+          </div>
+        )}
       </Sheet>
     </div>
   );

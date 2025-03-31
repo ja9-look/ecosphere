@@ -7,6 +7,7 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
+import { redirect } from "next/navigation";
 
 export interface CarbonCreditCardProps {
   id: string;
@@ -38,9 +39,15 @@ export default function CarbonCreditCard({
           variant="h6"
           gutterBottom
         >
-          {projectName}, {location}
+          {projectName}
         </Typography>
-
+        <Typography
+          variant="subtitle1"
+          color="textSecondary"
+          gutterBottom
+        >
+          {location}
+        </Typography>
         <Divider />
         <Typography
           variant="body2"
@@ -60,7 +67,12 @@ export default function CarbonCreditCard({
             </>
           )}
         </Typography>
-        <Button variant="contained">View Details</Button>
+        <Button
+          variant="contained"
+          onClick={() => redirect(`/carbon-credit/${id}/purchase`)}
+        >
+          Purchase
+        </Button>
       </CardContent>
     </Card>
   );

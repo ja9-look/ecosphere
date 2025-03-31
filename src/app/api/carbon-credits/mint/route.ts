@@ -22,8 +22,11 @@ const carbonCreditContractAddress =
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    if (session?.user.email !== "mintadmin@carboncredit.com") {
+      return NextResponse.json(
+        { message: "Unauthorized: Admin access required" },
+        { status: 403 }
+      );
     }
 
     const {
@@ -72,17 +75,16 @@ export async function POST(req: Request) {
     // console.log("wallet ID:", walletId);
     // console.log("amount: ", amount);
     // console.log("sesion token: ", session.user.userToken);
-    const ecosphereWalletId = process.env.ECOSPHERE_WALLET_ID;
 
     const mintResponse = await developerSdk.createContractExecutionTransaction({
-      walletId: ecosphereWalletId as string,
+      walletId: process.env.ECOSPHERE_WALLET_ID as string,
       abiFunctionSignature: "mintTo(address,string)",
       abiParameters: [walletAddress, metadataURI],
       contractAddress: carbonCreditContractAddress as string,
       fee: {
         type: "level",
         config: {
-          feeLevel: "MEDIUM",
+          feeLevel: "HIGH",
         },
       },
     });

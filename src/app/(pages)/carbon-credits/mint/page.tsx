@@ -1,14 +1,24 @@
 "use client";
-import Navbar from "../../../../components/navbar/Navbar";
 
+import Navbar from "../../../../components/navbar/Navbar";
 import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
-import { Paper, CircularProgress } from "@mui/material";
+import { CircularProgress, Snackbar, Alert } from "@mui/material";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useW3sContext } from "../../../../providers/W3sProvider";
+import {
+  Sheet,
+  Typography,
+  Button,
+  Select,
+  Option,
+  FormControl,
+  FormLabel,
+} from "@mui/joy";
+import { TextField } from "../../../../components/TextField";
 
 const validationSchema = yup.object().shape({
   projectName: yup
@@ -55,21 +65,22 @@ export default function MintPage() {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<FormValues>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       projectName: "",
       location: "",
-      amount: undefined,
-      vintage: undefined,
+      amount: 0,
+      vintage: 0,
       verificationStandard: "",
-      price: undefined,
+      price: 0,
     },
   });
 
   useEffect(() => {
     if (
-      status !== "authenticated" ||
+      status === "unauthenticated" ||
       !session?.user?.userToken ||
       !session?.user?.encryptionKey ||
       !client ||
@@ -82,7 +93,7 @@ export default function MintPage() {
       userToken: session.user.userToken,
       encryptionKey: session.user.encryptionKey,
     });
-  }, [session, client]);
+  }, [session, client, isInitialized, status]);
 
   const onSubmit = async (data: FormValues) => {
     if (!session?.user) {
@@ -152,36 +163,12 @@ export default function MintPage() {
         return;
       }
 
-      // const { challengeId } = await mintResponse.json();
-      console.log("page - mintResponse:", mintResponse);
-      setLoading(false);
-
-      // client?.execute(challengeId, async (error, result) => {
-      //   if (error) {
-      //     setSnackbar({
-      //       open: true,
-      //       message: `Error: ${error.message || "Minting failed"}`,
-      //       severity: "error",
-      //     });
-      //     throw new Error(
-      //       `Error executing challenge: ${error.message || "Unknown error"}`
-      //     );
-      //   }
-
-      //   // if (result) {
-      //   //   console.log(
-      //   //     "Page - Full Minting Result:",
-      //   //     JSON.stringify(result, null, 2)
-      //   //   );
-
-      //   setSnackbar({
-      //     open: true,
-      //     message: "Minting Carbon credit - Transaction Pending",
-      //     severity: "success",
-      //   });
-      //   // }
-      //   setLoading(false);
-      // });
+      const { state } = await mintResponse.json();
+      setSnackbar({
+        open: true,
+        message: `Minting Carbon credit - Transaction Status: ${state}`,
+        severity: "success",
+      });
     } catch (error) {
       console.error("Error minting carbon credits:", error);
       setSnackbar({
@@ -191,88 +178,177 @@ export default function MintPage() {
       });
     } finally {
       setIsSubmitting(false);
+      setLoading(false);
     }
   };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
+  if (status === "unauthenticated") {
+    redirect("/signin");
+  }
+
+  if (session?.user?.email !== "mintadmin@carboncredit.com") {
+    redirect("/carbon-credits");
+  }
 
   return (
     <div>
       <Navbar />
-      <Paper
-        sx={{
+      <div
+        style={{
           display: "flex",
-          flexDirection: "row",
-          gap: 4,
-          padding: 8,
+          flexDirection: "column",
+          alignItems: "center",
           justifyContent: "center",
           height: "100vh",
-          alignItems: "center",
         }}
       >
-        {loading && <CircularProgress size={20} />}
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div>
-            <label>Project Name</label>
-            <input {...register("projectName")} />
-            {errors.projectName && <span>{errors.projectName.message}</span>}
-          </div>
-          <div>
-            <label>Location</label>
-            <input {...register("location")} />
-            {errors.location && <span>{errors.location.message}</span>}
-          </div>
-          <div>
-            <label>Amount</label>
-            <input
-              type="number"
-              {...register("amount")}
-            />
-            {errors.amount && <span>{errors.amount.message}</span>}
-          </div>
-          <div>
-            <label>Vintage</label>
-            <input
-              type="year"
-              {...register("vintage")}
-            />
-            {errors.vintage && <span>{errors.vintage.message}</span>}
-          </div>
-          <div>
-            <label>Verification Standard</label>
-            <select {...register("verificationStandard")}>
-              <option value="VERRA">Verra</option>
-              <option value="GoldStandard">Gold Standard</option>
-              <option value="PlanVivo">Plan Vivo</option>
-              <option value="ClimateActionReseve">
-                Climate Action Reserve
-              </option>
-              <option value="AmericanCarbonRegistry">
-                American Carbon Registry
-              </option>
-              <option value="VerifiedCarbonStandard">
-                Verified Carbon Standard
-              </option>
-            </select>
-            {errors.verificationStandard && (
-              <span>{errors.verificationStandard.message}</span>
-            )}
-          </div>
-          <div>
-            <label>Price</label>
-            <input
-              type="number"
-              {...register("price")}
-            />
-            {errors.price && <span>{errors.price.message}</span>}
-          </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
+        <Sheet
+          variant="outlined"
+          sx={{
+            borderRadius: "md",
+            boxShadow: "md",
+            p: 4,
+            maxWidth: "500px",
+            width: "100%",
+          }}
+        >
+          <Typography
+            level="h3"
+            sx={{ mb: 3, textAlign: "center" }}
           >
-            {isSubmitting ? "Minting..." : "Mint Carbon Credits"}
-          </button>
-          {snackbar.open && <div>{snackbar.message}</div>}
-        </form>
-      </Paper>
+            Mint Carbon Credits
+          </Typography>
+
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+            }}
+          >
+            <FormControl error={!!errors.projectName}>
+              <FormLabel required>Project Name</FormLabel>
+              <TextField
+                placeholder="Enter project name"
+                error={!!errors.projectName}
+                helperText={errors.projectName?.message}
+                {...register("projectName")}
+              />
+            </FormControl>
+
+            <FormControl error={!!errors.location}>
+              <FormLabel required>Location</FormLabel>
+              <TextField
+                placeholder="Enter location"
+                error={!!errors.location}
+                helperText={errors.location?.message}
+                {...register("location")}
+              />
+            </FormControl>
+
+            <FormControl error={!!errors.amount}>
+              <FormLabel required>Amount (tonnes of CO2)</FormLabel>
+              <TextField
+                placeholder="Enter amount"
+                type="number"
+                error={!!errors.amount}
+                helperText={errors.amount?.message}
+                {...register("amount")}
+              />
+            </FormControl>
+
+            <FormControl error={!!errors.vintage}>
+              <FormLabel required>Vintage Year</FormLabel>
+              <TextField
+                placeholder="YYYY"
+                type="number"
+                error={!!errors.vintage}
+                helperText={errors.vintage?.message}
+                {...register("vintage")}
+              />
+            </FormControl>
+
+            <FormControl error={!!errors.verificationStandard}>
+              <FormLabel required>Verification Standard</FormLabel>
+              <Select
+                placeholder="Select standard"
+                defaultValue=""
+                {...register("verificationStandard")}
+              >
+                <Option value="VERRA">Verra</Option>
+                <Option value="GoldStandard">Gold Standard</Option>
+                <Option value="PlanVivo">Plan Vivo</Option>
+                <Option value="ClimateActionReseve">
+                  Climate Action Reserve
+                </Option>
+                <Option value="AmericanCarbonRegistry">
+                  American Carbon Registry
+                </Option>
+                <Option value="VerifiedCarbonStandard">
+                  Verified Carbon Standard
+                </Option>
+              </Select>
+              {errors.verificationStandard && (
+                <Typography
+                  level="body-xs"
+                  color="danger"
+                >
+                  {errors.verificationStandard.message}
+                </Typography>
+              )}
+            </FormControl>
+
+            <FormControl error={!!errors.price}>
+              <FormLabel required>Price (USDC)</FormLabel>
+              <TextField
+                placeholder="Enter price"
+                type="number"
+                error={!!errors.price}
+                helperText={errors.price?.message}
+                {...register("price")}
+              />
+            </FormControl>
+
+            <Button
+              type="submit"
+              loading={isSubmitting}
+              disabled={isSubmitting}
+              fullWidth
+              sx={{ mt: 2 }}
+              color="success"
+              size="lg"
+            >
+              {isSubmitting ? "Minting..." : "Mint Carbon Credits"}
+            </Button>
+          </form>
+
+          {loading && (
+            <div>
+              <CircularProgress size={20} />
+            </div>
+          )}
+        </Sheet>
+
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={8000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            variant="filled"
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </div>
     </div>
   );
 }
