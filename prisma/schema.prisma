@@ -60,3 +60,10 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model Metadata {
+  id            String   @id @default(uuid())
+  content       String   // JSON string of metadata
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

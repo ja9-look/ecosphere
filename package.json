@@ -39,6 +39,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@circle-fin/developer-controlled-wallets": "^7.2.0",
     "@eslint/eslintrc": "^3",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",

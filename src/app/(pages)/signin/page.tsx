@@ -5,7 +5,7 @@ import { authOptions, validOnboardStatus } from "../../../lib/auth";
 
 export default async function SignUpPage() {
   const session = await getServerSession(authOptions);
-
+  console.log("session:   ", session);
   if (session && (await validOnboardStatus(session))) {
     redirect("/dashboard");
   }

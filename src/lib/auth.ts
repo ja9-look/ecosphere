@@ -12,6 +12,10 @@ const client = initiateUserControlledWalletsClient({
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+    maxAge: 55 * 60,
+  },
   providers: [
     CredentialsProvider({
       id: "SignUp",
@@ -53,7 +57,7 @@ export const authOptions: NextAuthOptions = {
 
           const challengeResponse = await client.createUserPinWithWallets({
             userToken,
-            blockchains: ["AVAX-FUJI", "ETH-SEPOLIA"],
+            blockchains: ["ETH-SEPOLIA"],
           });
 
           const challengeId = challengeResponse.data?.challengeId;
@@ -119,6 +123,7 @@ export const authOptions: NextAuthOptions = {
 
           const userToken = tokenResponse.data?.userToken;
           const encryptionKey = tokenResponse.data?.encryptionKey;
+          const pinStatus = userResponse.data?.user.pinStatus;
 
           let challengeId: string | undefined;
           if (
@@ -128,13 +133,6 @@ export const authOptions: NextAuthOptions = {
             if (!userToken || !encryptionKey) {
               return null;
             }
-
-            const challengeResponse = await client.createUserPinWithWallets({
-              userToken,
-              blockchains: ["AVAX-FUJI"],
-            });
-
-            challengeId = challengeResponse.data?.challengeId;
           }
 
           return {
@@ -143,7 +141,8 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             userToken,
             encryptionKey,
-            challengeId: challengeId,
+            challengeId,
+            pinStatus,
           };
         } catch (error: any) {
           console.error("Circle integration error:", error);
@@ -173,11 +172,8 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/signin",
   },
-  session: {
-    strategy: "jwt",
-  },
 };
 
 export async function validOnboardStatus(session: any) {
-  return session?.user?.challengeId;
+  return !session?.user?.challengeId;
 }

@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import WalletCard from "../../../components/wallets/WalletCard";
 import { WalletCardProps } from "../../../components/wallets/WalletCard";
 import { Card, Sheet } from "@mui/joy";
+import { CircularProgress } from "@mui/material";
 
 export default function wallets() {
   const { data: session, status } = useSession();
@@ -14,9 +15,8 @@ export default function wallets() {
   const [wallets, setWallets] = useState<WalletCardProps[]>([]);
 
   useEffect(() => {
-    if (status !== "authenticated" || !session?.user) {
-      redirect("/");
-      return;
+    if (status !== "authenticated" || !session?.user.userToken) {
+      redirect("/dashboard");
     }
 
     const fetchData = async () => {
@@ -52,25 +52,19 @@ export default function wallets() {
           height: "100vh",
         }}
       >
-        {loading && <h4>Loading...</h4>}
+        {loading && <CircularProgress size={20} />}
         {wallets.length > 0 &&
-          wallets.map(
-            (wallet) => (
-              console.log(typeof wallet.balances.native.amount),
-              (
-                <div key={wallet.id}>
-                  <WalletCard
-                    key={wallet.id}
-                    id={wallet.id}
-                    address={wallet.address}
-                    blockchain={wallet.blockchain}
-                    balances={wallet.balances}
-                    isLoading={loading}
-                  />
-                </div>
-              )
-            )
-          )}
+          wallets.map((wallet) => (
+            <div key={wallet.id}>
+              <WalletCard
+                id={wallet.id}
+                address={wallet.address}
+                blockchain={wallet.blockchain}
+                balances={wallet.balances}
+                isLoading={loading}
+              />
+            </div>
+          ))}
       </Sheet>
       {wallets.length === 0 && !loading && (
         <div>

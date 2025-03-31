@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useW3sContext } from "../../../providers/W3sProvider";
 import styles from "./page.module.css";
 import Link from "next/link";
@@ -11,7 +11,6 @@ import Link from "next/link";
 export default function SetupPinPage() {
   const { data: session, status } = useSession();
   const { client, isInitialized } = useW3sContext();
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,18 +37,14 @@ export default function SetupPinPage() {
       }
 
       if (result) {
-        try {
-          await fetch("/api/user/onboarding", {
-            method: "POST",
-          });
+        await fetch("/api/user/onboarding", {
+          method: "POST",
+        });
 
-          router.push("/dashboard");
-        } catch (err) {
-          setError("Failed to complete onboarding");
-        }
+        redirect("/dashboard");
       }
     });
-  }, [session, client, isInitialized, router]);
+  }, [session, client, isInitialized]);
 
   if (status === "loading" || !isInitialized) {
     return (
@@ -60,7 +55,7 @@ export default function SetupPinPage() {
   }
 
   if (!session) {
-    router.push("/signin");
+    redirect("/signin");
     return null;
   }
 

@@ -71,7 +71,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
         } else if (response?.error) {
           console.log(response);
           console.log(client);
-          
+
           setFormMessage(response.error);
         } else {
           setFormMessage("Error occurred on sign up - please try again.");

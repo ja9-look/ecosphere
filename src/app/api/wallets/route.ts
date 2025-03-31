@@ -5,35 +5,10 @@ import {
   Blockchain,
   initiateUserControlledWalletsClient,
 } from "@circle-fin/user-controlled-wallets";
-import { ethers } from "ethers";
 
 const client = initiateUserControlledWalletsClient({
   apiKey: process.env.CIRCLE_API_KEY || "",
 });
-
-const getProvider = (blockchain: Blockchain) => {
-  switch (blockchain) {
-    case "AVAX-FUJI":
-      return new ethers.JsonRpcProvider(process.env.RPC_URL_FUJI);
-    case "ETH-SEPOLIA":
-      return new ethers.JsonRpcProvider(
-        `${process.env.RPC_URL_SEPOLIA}${process.env.INFURA_API_KEY}`
-      );
-    default:
-      throw new Error(`Unsupported blockchain: ${blockchain}`);
-  }
-};
-
-const getUsdcAddress = (blockchain: Blockchain) => {
-  switch (blockchain) {
-    case "AVAX-FUJI":
-      return process.env.USDC_ADDRESS_FUJI;
-    case "ETH-SEPOLIA":
-      return process.env.USDC_ADDRESS_SEPOLIA;
-    default:
-      throw new Error(`Unsupported blockchain: ${blockchain}`);
-  }
-};
 
 export async function GET(req: NextRequest) {
   try {
@@ -53,16 +28,22 @@ export async function GET(req: NextRequest) {
       try {
         const { id, address, blockchain } = wallet;
 
-        const provider = getProvider(blockchain);
-        const usdcAddress = getUsdcAddress(blockchain);
+        const balanceResponse = await client.getWalletTokenBalance({
+          walletId: id as string,
+          userToken: session.user.userToken as string,
+        });
 
-        const balance = await provider.getBalance(address);
-        if (!usdcAddress) {
-          throw new Error(
-            `USDC address is undefined for blockchain: ${blockchain}`
-          );
-        }
-        const usdcBalance = await provider.getBalance(usdcAddress);
+        console.log("balanceResponse:", balanceResponse.data);
+        const tokenBalance = balanceResponse.data?.tokenBalances?.find(
+          (token) =>
+            blockchain === "AVAX-FUJI"
+              ? token.token.symbol === "AVAX-FUJI"
+              : token.token.symbol === "ETH-SEPOLIA"
+        )?.amount;
+
+        const usdcTokenBalance = balanceResponse.data?.tokenBalances?.find(
+          (token) => token.token.symbol === "USDC"
+        )?.amount;
 
         wallets.push({
           id,
@@ -70,11 +51,15 @@ export async function GET(req: NextRequest) {
           blockchain,
           balances: {
             native: {
-              amount: ethers.formatEther(balance),
-              symbol: wallet.blockchain.includes("AVAX-FUJI") ? "AVAX" : "ETH",
+              amount:
+                tokenBalance && Number(tokenBalance) > 0 ? tokenBalance : "0",
+              symbol: blockchain,
             },
             usdc: {
-              amount: ethers.formatEther(usdcBalance),
+              amount:
+                usdcTokenBalance && Number(tokenBalance) > 0
+                  ? usdcTokenBalance
+                  : "0",
               symbol: "USDC",
             },
           },

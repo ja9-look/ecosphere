@@ -8,51 +8,50 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-export interface WalletCardProps {
+export interface CarbonCreditCardProps {
+  key: string;
   id: string;
   address: string;
-  blockchain: string;
-  balances: {
-    native: {
-      amount: string;
-      symbol: string;
-    };
-    usdc: {
-      amount: string;
-      symbol: string;
-    };
-  };
+  standard: string;
+  vintage: string;
+  project: string;
+  quantity: string;
+  amount: string;
+  price: string;
+  updatedAt: string;
   isLoading: boolean;
 }
 
-export default function WalletCard({
+export default function CarbonCreditCard({
+  key,
   id,
   address,
-  blockchain,
-  balances,
+  standard,
+  vintage,
+  project,
+  quantity,
+  amount,
+  price,
+  updatedAt,
   isLoading,
-}: WalletCardProps) {
+}: CarbonCreditCardProps) {
   return (
-    <Card sx={{ width: 400, height: 500, marginBottom: 2 }}>
+    <Card
+      key={key}
+      sx={{ width: 400, height: 500, marginBottom: 2 }}
+    >
       <CardContent>
         <Typography
           variant="h6"
           gutterBottom
         >
-          Wallet Id: {id}
+          Carbon Credit Id: {id}
         </Typography>
         <Typography
           variant="body2"
           gutterBottom
         >
           Wallet Address: {address}
-        </Typography>
-        <Typography
-          variant="body2"
-          gutterBottom
-        >
-          Blockchain Network:{" "}
-          {blockchain === "AVAX-FUJI" ? "Avalanche Fuji" : "Ethereum Sepolia"}
         </Typography>
         <Divider />
         <Typography
@@ -63,12 +62,17 @@ export default function WalletCard({
             <CircularProgress size={20} />
           ) : (
             <>
-              {parseFloat(balances.native.amount) === 0
-                ? 0
-                : parseFloat(balances.native.amount).toFixed(4)}{" "}
-              {balances.native.symbol}
+              {quantity} {standard} Credits
               <br />
-              {balances.usdc.amount} {balances.usdc.symbol}
+              Vintage: {vintage}
+              <br />
+              Project: {project}
+              <br />
+              Amount: {amount} {standard}
+              <br />
+              Price: {price} USDC
+              <br />
+              Updated At: {updatedAt}
             </>
           )}
         </Typography>
