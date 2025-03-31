@@ -65,13 +65,13 @@ export async function POST(req: Request) {
     )?.address;
 
     const tokenId = Math.floor(Date.now() / 1000);
-    console.log("userToken:", session.user.userToken);
-    console.log("Wallet Address:", walletAddress);
-    console.log("Metadata URI:", metadataURI);
-    console.log("Contract Address:", carbonCreditContractAddress);
-    console.log("wallet ID:", walletId);
-    console.log("amount: ", amount);
-    console.log("sesion token: ", session.user.userToken);
+    // console.log("userToken:", session.user.userToken);
+    // console.log("Wallet Address:", walletAddress);
+    // console.log("Metadata URI:", metadataURI);
+    // console.log("Contract Address:", carbonCreditContractAddress);
+    // console.log("wallet ID:", walletId);
+    // console.log("amount: ", amount);
+    // console.log("sesion token: ", session.user.userToken);
     const ecosphereWalletId = process.env.ECOSPHERE_WALLET_ID;
 
     const mintResponse = await developerSdk.createContractExecutionTransaction({

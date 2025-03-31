@@ -9,50 +9,38 @@ import {
 } from "@mui/material";
 
 export interface CarbonCreditCardProps {
-  key: string;
   id: string;
-  address: string;
-  standard: string;
-  vintage: string;
-  project: string;
-  quantity: string;
-  amount: string;
-  price: string;
-  updatedAt: string;
-  isLoading: boolean;
+  projectName: string;
+  location: string;
+  amount: number;
+  vintage: number;
+  verificationStandard: string;
+  price: number;
+  isVerified: boolean;
+  isLoading?: boolean;
 }
 
 export default function CarbonCreditCard({
-  key,
   id,
-  address,
-  standard,
-  vintage,
-  project,
-  quantity,
+  projectName,
+  location,
   amount,
+  vintage,
+  verificationStandard,
   price,
-  updatedAt,
+  isVerified,
   isLoading,
 }: CarbonCreditCardProps) {
   return (
-    <Card
-      key={key}
-      sx={{ width: 400, height: 500, marginBottom: 2 }}
-    >
+    <Card sx={{ width: 400, height: 500, marginBottom: 2 }}>
       <CardContent>
         <Typography
           variant="h6"
           gutterBottom
         >
-          Carbon Credit Id: {id}
+          {projectName}, {location}
         </Typography>
-        <Typography
-          variant="body2"
-          gutterBottom
-        >
-          Wallet Address: {address}
-        </Typography>
+
         <Divider />
         <Typography
           variant="body2"
@@ -62,17 +50,13 @@ export default function CarbonCreditCard({
             <CircularProgress size={20} />
           ) : (
             <>
-              {quantity} {standard} Credits
+              Amount: {amount}
               <br />
               Vintage: {vintage}
               <br />
-              Project: {project}
+              Verification Standard: {verificationStandard}
               <br />
-              Amount: {amount} {standard}
-              <br />
-              Price: {price} USDC
-              <br />
-              Updated At: {updatedAt}
+              Price: {price}
             </>
           )}
         </Typography>

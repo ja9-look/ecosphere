@@ -3,10 +3,23 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../lib/auth";
 import { initiateUserControlledWalletsClient } from "@circle-fin/user-controlled-wallets";
 import { NextResponse } from "next/server";
+import { isReadable } from "stream";
 
 const client = initiateUserControlledWalletsClient({
   apiKey: process.env.CIRCLE_API_KEY || "",
 });
+
+const fetchMetadata = async (url: string) => {
+  try {
+    const metadataResponse = await fetch(url);
+    if (!metadataResponse.ok) {
+      return null;
+    }
+    return await metadataResponse.json();
+  } catch (error) {
+    return null;
+  }
+};
 
 export async function GET(req: Request) {
   try {
@@ -36,33 +49,41 @@ export async function GET(req: Request) {
 
     console.log("nftbalanceResponse:", nftBalanceResponse.data);
 
-    const carbonCredits =
-      nftBalanceResponse.data?.nfts?.map(async (nft) => {
-        let metadata = {};
-        try {
-          if (
-            typeof nft.metadata === "string" &&
-            nft.metadata.startsWith("http")
-          ) {
-            const response = await fetch(nft.metadata);
-            if (!response.ok) {
-              throw new Error("Failed to fetch metadata");
-            }
-            metadata = await response.json();
-          }
-        } catch (error) {
-          console.error("Error fetching metadata:", error);
-        }
+    const nfts = nftBalanceResponse.data?.nfts || [];
+    if (nfts.length === 0) {
+      return NextResponse.json({ message: "No NFTs found" }, { status: 404 });
+    }
 
-        console.log("my carbon credits:", nftBalanceResponse.data?.nfts);
-        return {
-          tokenId: nft.nftTokenId,
-          amount: nft.amount,
-          metadata: {
-            ...metadata,
-          },
-        };
-      }) || [];
+    const carbonCreditsPromises = nfts.map(async (nft) => {
+      if (
+        !nft.metadata ||
+        !nft.metadata.startsWith("http") ||
+        nft.metadata.length !== 71
+      ) {
+        return null;
+      }
+
+      if (!nft.nftTokenId) {
+        return null;
+      }
+
+      const metadata = await fetchMetadata(nft.metadata);
+
+      return {
+        tokenId: nft.nftTokenId,
+        amount: nft.amount,
+        metadata: {
+          ...metadata.metadata,
+        },
+        originalMetadataUrl: nft.metadata,
+      };
+    });
+
+    const allResults = await Promise.all(carbonCreditsPromises);
+    const carbonCredits = allResults.filter((credit) => credit !== null);
+
+    console.log("filtered carbon credits: ", carbonCredits);
+
     return NextResponse.json({ carbonCredits }, { status: 200 });
   } catch (error) {
     console.error("Error fetching carbon credits:", error);
