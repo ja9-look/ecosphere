@@ -31,37 +31,35 @@ export const Navbar: React.FC = () => {
           zIndex: 100,
           width: "100%",
           boxShadow: "sm",
+          padding: "0 16px",
         }}
       >
-        <Container>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-around",
-              alignItems: "center",
-              minHeight: "64px",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Link
-                href={status === "authenticated" ? "/marketplace" : "/"}
-                style={{ display: "flex", alignItems: "center" }}
-              >
-                <Image
-                  src="/ecosphere_logo_no_text.png"
-                  alt="Ecosphere Logo"
-                  width={50}
-                  height={40}
-                />
-                <Image
-                  src="/ecosphere_logo_text.png"
-                  alt="Ecosphere"
-                  width={110}
-                  height={20}
-                />
-              </Link>
-            </Box>
-
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            minHeight: "64px",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <Link
+              href={status === "authenticated" ? "/marketplace" : "/"}
+              style={{ display: "flex", alignItems: "center" }}
+            >
+              <Image
+                src="/ecosphere_logo_no_text.png"
+                alt="Ecosphere Logo"
+                width={50}
+                height={40}
+              />
+              <Image
+                src="/ecosphere_logo_text.png"
+                alt="Ecosphere"
+                width={110}
+                height={20}
+              />
+            </Link>
             <Box
               sx={{
                 display: { xs: "none", md: "flex" },
@@ -97,35 +95,34 @@ export const Navbar: React.FC = () => {
                   </Link>
                 ))}
             </Box>
-
-            <Box
-              sx={{
-                display: { xs: "none", md: "flex" },
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              {status === "authenticated" && (
-                <>
-                  <Typography
-                    level="body-sm"
-                    sx={{ mr: 2 }}
-                  >
-                    {session?.user?.email}
-                  </Typography>
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="sm"
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                  >
-                    Sign Out
-                  </Button>
-                </>
-              )}
-            </Box>
           </Box>
-        </Container>
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" },
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            {status === "authenticated" && (
+              <>
+                <Typography
+                  level="body-sm"
+                  sx={{ mr: 2 }}
+                >
+                  {session?.user?.email}
+                </Typography>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  size="sm"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                >
+                  Sign Out
+                </Button>
+              </>
+            )}
+          </Box>
+        </Box>
       </Sheet>
     </div>
   );
