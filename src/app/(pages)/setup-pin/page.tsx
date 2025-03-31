@@ -15,7 +15,7 @@ export default function SetupPinPage() {
 
   useEffect(() => {
     if (
-      status !== "authenticated" ||
+      status === "unauthenticated" ||
       !session?.user?.userToken ||
       !session?.user?.encryptionKey ||
       !session?.user?.challengeId ||

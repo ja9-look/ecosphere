@@ -16,13 +16,16 @@ const developerSdk = initiateDeveloperControlledWalletsClient({
   entitySecret: process.env.CIRCLE_ENTITY_SECRET || "",
 });
 
+console.log("CIRCLE_API_KEY: ", process.env.CIRCLE_API_KEY);
+console.log("CIRCLE_ENTITY_SECRET: ", process.env.CIRCLE_ENTITY_SECRET);
+
 const carbonCreditContractAddress =
   process.env.CARBON_CREDIT_CIRCLE_CONTRACT_ADDRESS;
 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (session?.user.email !== "mintadmin@carboncredit.com") {
+    if (session?.user.email !== "admin@carboncredit.com") {
       return NextResponse.json(
         { message: "Unauthorized: Admin access required" },
         { status: 403 }
@@ -68,13 +71,13 @@ export async function POST(req: Request) {
     )?.address;
 
     const tokenId = Math.floor(Date.now() / 1000);
-    // console.log("userToken:", session.user.userToken);
-    // console.log("Wallet Address:", walletAddress);
-    // console.log("Metadata URI:", metadataURI);
-    // console.log("Contract Address:", carbonCreditContractAddress);
-    // console.log("wallet ID:", walletId);
-    // console.log("amount: ", amount);
-    // console.log("sesion token: ", session.user.userToken);
+    console.log("userToken:", session.user.userToken);
+    console.log("Wallet Address:", walletAddress);
+    console.log("Metadata URI:", metadataURI);
+    console.log("Contract Address:", carbonCreditContractAddress);
+    console.log("wallet ID:", walletId);
+    console.log("amount: ", amount);
+    console.log("sesion token: ", session.user.userToken);
 
     const mintResponse = await developerSdk.createContractExecutionTransaction({
       walletId: process.env.ECOSPHERE_WALLET_ID as string,

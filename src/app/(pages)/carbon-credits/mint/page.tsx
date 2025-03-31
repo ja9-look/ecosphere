@@ -191,7 +191,7 @@ export default function MintPage() {
     redirect("/signin");
   }
 
-  if (session?.user?.email !== "mintadmin@carboncredit.com") {
+  if (session?.user?.email !== "admin@carboncredit.com") {
     redirect("/carbon-credits");
   }
 
@@ -307,7 +307,7 @@ export default function MintPage() {
             </FormControl>
 
             <FormControl error={!!errors.price}>
-              <FormLabel required>Price (USDC)</FormLabel>
+              <FormLabel required>Price/Tonne (USDC)</FormLabel>
               <TextField
                 placeholder="Enter price"
                 type="number"

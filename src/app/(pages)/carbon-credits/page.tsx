@@ -9,20 +9,7 @@ import { Button, Sheet } from "@mui/joy";
 import CarbonCreditCard, {
   CarbonCreditCardProps,
 } from "../../../components/carbon-credits/CarbonCreditCard";
-
-interface CarbonCredit {
-  tokenId: string;
-  metadata: {
-    projectName: string;
-    location: string;
-    amount: number;
-    vintage: number;
-    verificationStandard: string;
-    price: number;
-    isVerified: boolean;
-  };
-  originalMetadataUrl: string;
-}
+import { CarbonCredit } from "../../../types/types";
 
 export default function CarbonCredits() {
   const { data: session, status } = useSession();
@@ -30,7 +17,7 @@ export default function CarbonCredits() {
   const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
 
   useEffect(() => {
-    if (status !== "authenticated" || !session?.user) {
+    if (status === "unauthenticated" || !session?.user) {
       redirect("/");
       return;
     }
@@ -72,7 +59,7 @@ export default function CarbonCredits() {
           height: "100vh",
         }}
       >
-        {session?.user.email === "mintadmin@carboncredit.com" && (
+        {session?.user.email === "admin@carboncredit.com" && (
           <Button
             variant="solid"
             color="success"
@@ -90,7 +77,7 @@ export default function CarbonCredits() {
         )}
         {loading && <CircularProgress size={20} />}
         {carbonCredits.length > 0 &&
-          [...carbonCredits].reverse().map((credit) => (
+          [...carbonCredits].map((credit) => (
             <div key={credit.tokenId}>
               <CarbonCreditCard
                 id={credit.tokenId}

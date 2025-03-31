@@ -3,7 +3,6 @@ import prisma from "../../../../lib/prisma";
 
 export async function GET(req: NextRequest) {
   try {
-    // get id from pathname
     const { pathname } = req.nextUrl;
     const id = pathname.split("/").pop();
     const metadata = await prisma.metadata.findUnique({
