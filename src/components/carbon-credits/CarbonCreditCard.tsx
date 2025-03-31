@@ -8,6 +8,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { redirect } from "next/navigation";
+import { VERIFICATION_STANDARDS } from "../../types/types";
 
 export interface CarbonCreditCardProps {
   id: string;
@@ -33,7 +34,7 @@ export default function CarbonCreditCard({
   isLoading,
 }: CarbonCreditCardProps) {
   return (
-    <Card sx={{ width: 400, height: 500, marginBottom: 2 }}>
+    <Card sx={{ width: 400, height: 250, marginBottom: 2 }}>
       <CardContent>
         <Typography
           variant="h6"
@@ -50,29 +51,33 @@ export default function CarbonCreditCard({
         </Typography>
         <Divider />
         <Typography
-          variant="body2"
+          variant="body1"
           gutterBottom
         >
           {isLoading ? (
             <CircularProgress size={20} />
           ) : (
             <>
+              <br />
               Amount: {amount}
               <br />
               Vintage: {vintage}
               <br />
-              Verification Standard: {verificationStandard}
+              Verification Standard:{" "}
+              {verificationStandard in VERIFICATION_STANDARDS}
               <br />
               Price: {price}
             </>
           )}
         </Typography>
+        {/* <br />
         <Button
           variant="contained"
+          color="secondary"
           onClick={() => redirect(`/carbon-credit/${id}/purchase`)}
         >
           Purchase
-        </Button>
+        </Button> */}
       </CardContent>
     </Card>
   );

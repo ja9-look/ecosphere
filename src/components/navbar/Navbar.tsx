@@ -17,7 +17,6 @@ export const Navbar: React.FC = () => {
   const { data: session, status } = useSession();
 
   const authenticatedItems: NavItem[] = [
-    { label: "Dashboard", href: "/dashboard" },
     { label: "Marketplace", href: "/marketplace" },
     { label: "My Carbon Credits", href: "/carbon-credits" },
     { label: "My Wallets", href: "/wallets" },
@@ -45,7 +44,7 @@ export const Navbar: React.FC = () => {
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Link
-                href={status === "authenticated" ? "/dashboard" : "/"}
+                href={status === "authenticated" ? "/marketplace" : "/"}
                 style={{ display: "flex", alignItems: "center" }}
               >
                 <Image

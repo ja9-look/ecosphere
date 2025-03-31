@@ -41,7 +41,7 @@ export default function SetupPinPage() {
           method: "POST",
         });
 
-        redirect("/dashboard");
+        redirect("/marketplace");
       }
     });
   }, [session, client, isInitialized]);
@@ -61,7 +61,7 @@ export default function SetupPinPage() {
 
   return (
     <div className={styles.setupPinContainer}>
-      <Link href={session ? "/dashboard" : "/"}>
+      <Link href={session ? "/marketplace" : "/"}>
         <Image
           src="/ecosphere_logo.png"
           alt="Ecosphere"

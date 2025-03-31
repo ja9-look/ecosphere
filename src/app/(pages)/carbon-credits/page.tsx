@@ -115,7 +115,7 @@ export default function CarbonCredits() {
             }}
           >
             <h3>No carbon credits found</h3>
-            <p>Browse our Marketplace to buy your first carbon credit!</p>
+            <p>Explore all carbon credits our Marketplace!</p>
           </div>
         )}
       </Sheet>

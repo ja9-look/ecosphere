@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
 import React, { useState, useEffect } from "react";
 import { CircularProgress, Snackbar, Alert } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useW3sContext } from "../../../../providers/W3sProvider";
@@ -19,6 +19,7 @@ import {
   FormLabel,
 } from "@mui/joy";
 import { TextField } from "../../../../components/TextField";
+import { VERIFICATION_STANDARDS } from "../../../../types/types";
 
 const validationSchema = yup.object().shape({
   projectName: yup
@@ -275,24 +276,26 @@ export default function MintPage() {
 
             <FormControl error={!!errors.verificationStandard}>
               <FormLabel required>Verification Standard</FormLabel>
-              <Select
-                placeholder="Select standard"
-                defaultValue=""
-                {...register("verificationStandard")}
-              >
-                <Option value="VERRA">Verra</Option>
-                <Option value="GoldStandard">Gold Standard</Option>
-                <Option value="PlanVivo">Plan Vivo</Option>
-                <Option value="ClimateActionReseve">
-                  Climate Action Reserve
-                </Option>
-                <Option value="AmericanCarbonRegistry">
-                  American Carbon Registry
-                </Option>
-                <Option value="VerifiedCarbonStandard">
-                  Verified Carbon Standard
-                </Option>
-              </Select>
+              <Controller
+                name="verificationStandard"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    placeholder="Select standard"
+                    onChange={(_, value) => field.onChange(value)}
+                  >
+                    {VERIFICATION_STANDARDS.map((standard) => (
+                      <Option
+                        key={standard}
+                        value={standard}
+                      >
+                        {standard}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              />
               {errors.verificationStandard && (
                 <Typography
                   level="body-xs"

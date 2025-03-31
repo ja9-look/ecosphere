@@ -48,7 +48,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ isSignIn = true }) => {
       if (session.user?.challengeId) {
         router.push("/setup-pin");
       } else {
-        router.push("/dashboard");
+        router.push("/marketplace");
       }
       setLoading(false);
     }

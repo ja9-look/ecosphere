@@ -7,7 +7,7 @@ export default async function SignUpPage() {
   const session = await getServerSession(authOptions);
 
   if (session && (await validOnboardStatus(session))) {
-    redirect("/dashboard");
+    redirect("/marketplace");
   }
 
   if (session && !(await validOnboardStatus(session))) {

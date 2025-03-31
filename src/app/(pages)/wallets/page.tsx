@@ -16,7 +16,7 @@ export default function wallets() {
 
   useEffect(() => {
     if (status !== "authenticated" || !session?.user.userToken) {
-      redirect("/dashboard");
+      redirect("/marketplace");
     }
 
     const fetchData = async () => {
