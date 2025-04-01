@@ -1,6 +1,6 @@
 import Image from "next/image";
 import styles from "./page.module.css";
-import { Button } from "@mui/joy";
+import { Box, Button } from "@mui/joy";
 
 export default function Home() {
   return (
@@ -14,7 +14,7 @@ export default function Home() {
           height={200}
         />
         <h4>sustainable · transparent · decentralized</h4>
-        <div className={styles.ctas}>
+        <Box className={styles.ctas}>
           <Button
             className={styles.signin}
             variant="solid"
@@ -33,7 +33,7 @@ export default function Home() {
           >
             Sign Up
           </Button>
-        </div>
+        </Box>
       </div>
       <footer className={styles.footer}>
         <h6>© 2025 ecosphere. All rights reserved.</h6>

@@ -18,7 +18,12 @@ export default function Purchase() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (
+      status === "unauthenticated" ||
+      !client ||
+      !session?.user?.userToken ||
+      !session?.user?.encryptionKey
+    ) {
       redirect("/");
     }
   }, [session, client, isInitialized]);
@@ -39,34 +44,38 @@ export default function Purchase() {
         }
       );
       const swapData = await fetchSwapDetails.json();
-      if (swapData?.challengeId) {
-        await client?.execute(swapData.challengeId, async (error, result) => {
+      console.log("swapData: ", swapData.challengeId);
+      if (swapData.challengeId && client && session) {
+        await client.setAuthentication({
+          userToken: session.user.userToken as string,
+          encryptionKey: session.user.encryptionKey as string,
+        });
+
+        await client.execute(swapData.challengeId, async (error, result) => {
           if (error) {
             setError(`Error: ${error.message || "PIN setup failed"}`);
             return;
           }
 
           if (result) {
-            console.log("challengeId: ", swapData.challengeId);
-            // await fetch(`/api/carbon-credits/${id}/purchase`, {
-            //     method: "POST",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify({
-            //         action: "executeSwap",
-            //         tokenId: id,
-            //         price: swapData.price,
-            //         seller: swapData.seller,
-            //     })
-            // }).then((response) => {
-            //     if(response.ok) {
-            //         redirect("/carbon-credits");
-            //     } else {
-            //         setError("Failed to execute swap");
-            //     }
-            // });
-            // setLoading(false);
+            await fetch(`/api/carbon-credits/${id}/purchase`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                action: "executeSwap",
+                tokenId: id,
+                price: swapData.price,
+                seller: swapData.seller,
+              }),
+            }).then((response) => {
+              if (response.ok) {
+                redirect("/carbon-credits");
+              } else {
+                setError("Failed to execute swap");
+              }
+            });
           }
           setLoading(false);
         });
@@ -106,18 +115,18 @@ export default function Purchase() {
             level="h3"
             sx={{ mb: 3 }}
           >
-            Mint Carbon Credits
+            Purchase Carbon Credit
           </Typography>
 
           <Button
             variant="solid"
-            color="primary"
+            color="success"
             sx={{ width: "50%", mb: 2 }}
             onClick={handlePurchase}
             disabled={loading}
             endDecorator={loading ? <CircularProgress size={24} /> : null}
           >
-            {loading ? "Processing..." : "Purchase Carbon Credit"}
+            {loading ? "Processing..." : "Buy"}
           </Button>
         </Sheet>
       </div>

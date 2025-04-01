@@ -132,6 +132,10 @@ export async function POST(
         },
       });
 
+      console.log(
+        "createTxResponse: ",
+        JSON.stringify(createTxResponse.data, null, 2)
+      );
       return NextResponse.json(
         {
           message: "Transaction created successfully - challenge id returned",
