@@ -121,7 +121,9 @@ export default function CarbonCreditCard({
           >
             {price} USDC
           </Typography>
-          {!isAdmin && approvalStatus[id] === "success" && (
+          {!isAdmin && (
+            // the following line will be enabled when the purchase function is implemented
+            // && approvalStatus[id] === "success"
             <Button
               variant="solid"
               color="success"
