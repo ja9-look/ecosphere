@@ -1,11 +1,9 @@
-// lib/auth.ts
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { initiateUserControlledWalletsClient } from "@circle-fin/user-controlled-wallets";
 import bcrypt from "bcrypt";
 import prisma from "./prisma";
-import { NextResponse } from "next/server";
 
 const client = initiateUserControlledWalletsClient({
   apiKey: process.env.CIRCLE_API_KEY || "",
