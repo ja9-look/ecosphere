@@ -32,7 +32,7 @@ To run this application locally, you'll need:
 - Node.js (v16+)
 - npm or yarn
 - Circle Developer Account with API keys
-- Ethereum wallet (Metamask recommended for testing)
+- Ethereum wallet (Circle's Programmable Wallets recommended for testing)
 - Sepolia Testnet ETH for gas fees
 
 ## Environment Setup
