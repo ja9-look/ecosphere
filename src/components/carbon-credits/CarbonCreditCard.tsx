@@ -1,15 +1,18 @@
-import React from "react";
+"use client";
+
+import { redirect } from "next/navigation";
 import {
   Card,
   CardContent,
-  Typography,
+  Box,
   Button,
-  Divider,
   CircularProgress,
-} from "@mui/material";
-import { redirect } from "next/navigation";
+  Alert,
+} from "@mui/joy";
+import { Typography } from "@mui/material";
+import { useSession } from "next-auth/react";
 
-export interface CarbonCreditCardProps {
+interface CarbonCreditCardProps {
   id: string;
   projectName: string;
   location: string;
@@ -18,8 +21,10 @@ export interface CarbonCreditCardProps {
   verificationStandard: string;
   price: number;
   isVerified: boolean;
-  isLoading?: boolean;
-  showPurchaseButton?: boolean;
+  isLoading: boolean;
+  onApprove?: (tokenId: string) => Promise<void>;
+  approvingId?: string | null;
+  approvalStatus?: { [key: string]: string };
 }
 
 export default function CarbonCreditCard({
@@ -32,63 +37,133 @@ export default function CarbonCreditCard({
   price,
   isVerified,
   isLoading,
-  showPurchaseButton = false,
+  onApprove,
+  approvingId,
+  approvalStatus = {},
 }: CarbonCreditCardProps) {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.email === "admin@carboncredit.com";
+
+  const handlePurchase = () => {
+    redirect(`/carbon-credits/${id}/purchase`);
+  };
+
   return (
     <Card
+      variant="outlined"
       sx={{
-        width: 400,
-        height: showPurchaseButton ? 300 : 250,
-        marginBottom: 2,
+        width: 320,
+        height: 350,
       }}
     >
-      <CardContent>
-        <Typography
-          variant="h6"
-          gutterBottom
-        >
-          {projectName}
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          color="textSecondary"
-          gutterBottom
-        >
-          {location}
-        </Typography>
-        <Divider />
-        <Typography
-          variant="body1"
-          gutterBottom
-        >
-          {isLoading ? (
-            <CircularProgress size={20} />
-          ) : (
+      <CardContent
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{ mb: 1 }}
+          >
+            {projectName}
+          </Typography>
+
+          <Box sx={{ mb: 1 }}>
+            <Typography variant="body2">
+              <strong>Location:</strong> {location}
+            </Typography>
+            <Typography variant="body2">
+              <strong>Amount:</strong> {amount}{" "}
+              {amount > 1 ? "tonnes" : "tonne"}
+            </Typography>
+            <Typography variant="body2">
+              <strong>Vintage:</strong> {vintage}
+            </Typography>
+            <Typography variant="body2">
+              <strong>Standard:</strong> {verificationStandard}
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              bgcolor: isVerified ? "success.100" : "warning.100",
+              color: isVerified ? "success.700" : "warning.700",
+              py: 0.5,
+              px: 1,
+              borderRadius: "sm",
+              width: "fit-content",
+              mb: 1,
+            }}
+          >
+            <Typography
+              variant="body1"
+              fontWeight="bold"
+            >
+              {isVerified ? "Verified" : "Unverified"}
+            </Typography>
+          </Box>
+        </Box>
+
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+          <Typography
+            variant="h6"
+            sx={{
+              textAlign: "right",
+              fontWeight: "bold",
+              mb: 0.5,
+            }}
+          >
+            {price} USDC
+          </Typography>
+          {!isAdmin && approvalStatus[id] === "success" && (
+            <Button
+              variant="solid"
+              color="success"
+              onClick={handlePurchase}
+              disabled={isLoading}
+              fullWidth
+            >
+              {isLoading ? <CircularProgress size="sm" /> : "Purchase"}
+            </Button>
+          )}
+          {isAdmin && onApprove && (
             <>
-              <br />
-              Amount: {amount}
-              <br />
-              Vintage: {vintage}
-              <br />
-              Verification Standard: {verificationStandard}
-              <br />
-              Price: {price}
+              <Button
+                color="primary"
+                variant="solid"
+                onClick={() => onApprove(id)}
+                disabled={
+                  approvingId === id || approvalStatus[id] === "success"
+                }
+                startDecorator={
+                  approvingId === id ? <CircularProgress size="sm" /> : null
+                }
+                fullWidth
+              >
+                {approvalStatus[id] === "success"
+                  ? "Approved ✓"
+                  : approvingId === id
+                  ? "Approving..."
+                  : "Approve for Sale"}
+              </Button>
+
+              {approvalStatus[id] === "failed" && (
+                <Alert
+                  color="danger"
+                  size="sm"
+                >
+                  Approval failed. Try again.
+                </Alert>
+              )}
             </>
           )}
-        </Typography>
-        {showPurchaseButton && (
-          <>
-            <br />
-            <Button
-              style={{ float: "right" }}
-              variant="contained"
-              color="success"
-              onClick={() => redirect(`/carbon-credits/${id}/purchase`)}
-            >
-              Purchase
-            </Button>
-          </>
-        )}
+        </Box>
       </CardContent>
     </Card>
   );

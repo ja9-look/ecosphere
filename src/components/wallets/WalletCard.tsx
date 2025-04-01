@@ -74,7 +74,7 @@ export default function WalletCard({
           >
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <AccountBalanceWalletIcon
-                sx={{ mr: 1, color: "action.active" }}
+                sx={{ ml: -0.3, mr: 0.8, color: "action.active", fontSize: 18 }}
               />
               <Typography level="body-md">{truncatedAddress}</Typography>
             </Box>

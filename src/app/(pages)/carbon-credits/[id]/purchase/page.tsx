@@ -2,10 +2,9 @@
 
 import { redirect, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Sheet, Typography } from "@mui/joy";
 import { CircularProgress } from "@mui/material";
-import { initiateUserControlledWalletsClient } from "@circle-fin/user-controlled-wallets";
 import { useW3sContext } from "../../../../../providers/W3sProvider";
 import Navbar from "../../../../../components/navbar/Navbar";
 
@@ -16,22 +15,23 @@ export default function Purchase() {
   const { client, isInitialized } = useW3sContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [swapDetails, setSwapDetails] = useState<{
+    tokenId: string;
+    price: string;
+    sellerAddress: string;
+  } | null>(null);
 
   useEffect(() => {
-    if (
-      status === "unauthenticated" ||
-      !client ||
-      !session?.user?.userToken ||
-      !session?.user?.encryptionKey
-    ) {
+    if (status === "unauthenticated") {
       redirect("/");
     }
   }, [session, client, isInitialized]);
 
-  const handlePurchase = async () => {
+  const handleInitiateSwap = async () => {
     try {
       setLoading(true);
-      const fetchSwapDetails = await fetch(
+
+      const detailsResponse = await fetch(
         `/api/carbon-credits/${id}/purchase`,
         {
           method: "POST",
@@ -39,53 +39,70 @@ export default function Purchase() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            action: "getDetails",
+            action: "initiateSwap",
           }),
         }
       );
-      const swapData = await fetchSwapDetails.json();
-      console.log("swapData: ", swapData.challengeId);
-      if (swapData.challengeId && client && session) {
+
+      const swapData = await detailsResponse.json();
+      console.log("Swap data:", swapData);
+      setSwapDetails(swapData);
+
+      const executeResponse = await fetch(
+        `/api/carbon-credits/${id}/purchase`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "executeSwap",
+            price: swapData.price,
+            sellerAddress: swapData.sellerAddress,
+          }),
+        }
+      );
+
+      console.log("Execute response status:", executeResponse.status);
+      const executeData = await executeResponse.json();
+      console.log("Execute response data:", executeData);
+      if (
+        executeData.challengeId &&
+        client &&
+        session?.user.userToken &&
+        session?.user.encryptionKey
+      ) {
         await client.setAuthentication({
-          userToken: session.user.userToken as string,
-          encryptionKey: session.user.encryptionKey as string,
+          userToken: session.user.userToken,
+          encryptionKey: session.user.encryptionKey,
         });
 
-        await client.execute(swapData.challengeId, async (error, result) => {
-          if (error) {
-            setError(`Error: ${error.message || "PIN setup failed"}`);
-            return;
-          }
+        console.log("Challenge ID:", executeData.challengeId);
+        await client?.execute(
+          executeData.challengeId,
+          async (error, result) => {
+            if (error) {
+              setError(`Error: ${error.message}`);
+              return;
+            }
 
-          if (result) {
-            await fetch(`/api/carbon-credits/${id}/purchase`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                action: "executeSwap",
-                tokenId: id,
-                price: swapData.price,
-                seller: swapData.seller,
-              }),
-            }).then((response) => {
-              if (response.ok) {
-                redirect("/carbon-credits");
-              } else {
-                setError("Failed to execute swap");
-              }
-            });
+            if (result) {
+              console.log("Swap executed successfully:", result);
+              const status = result.status;
+              console.log("Transaction Hash:", status);
+              redirect("/carbon-credits");
+            }
           }
-          setLoading(false);
-        });
+        );
       }
     } catch (error) {
-      console.error("Error fetching swap details:", error);
-      setError("Failed to fetch swap details");
+      console.error("Swap error:", error);
+      setError("Failed to complete swap");
+    } finally {
       setLoading(false);
     }
   };
+
   return (
     <div>
       <Navbar />
@@ -118,11 +135,20 @@ export default function Purchase() {
             Purchase Carbon Credit
           </Typography>
 
+          {error && (
+            <Typography
+              color="danger"
+              sx={{ mb: 2 }}
+            >
+              {error}
+            </Typography>
+          )}
+
           <Button
             variant="solid"
             color="success"
             sx={{ width: "50%", mb: 2 }}
-            onClick={handlePurchase}
+            onClick={handleInitiateSwap}
             disabled={loading}
             endDecorator={loading ? <CircularProgress size={24} /> : null}
           >

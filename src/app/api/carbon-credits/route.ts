@@ -9,6 +9,10 @@ const client = initiateUserControlledWalletsClient({
   apiKey: process.env.CIRCLE_API_KEY || "",
 });
 
+const CARBON_CREDIT_SWAP_CONTRACT_ADDRESS =
+  process.env.CARBON_CREDIT_SWAP_CONTRACT_ADDRESS;
+const CIRCLE_ENTITY_CIPHERTEXT = process.env.CIRCLE_ENTITY_CIPHERTEXT;
+
 const fetchMetadata = async (url: string) => {
   try {
     const metadataResponse = await fetch(url);
@@ -89,6 +93,109 @@ export async function GET(req: Request) {
     console.error("Error fetching carbon credits:", error);
     return NextResponse.json(
       { message: "Failed to fetch carbon credits" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    if (session.user.email !== "admin@carboncredit.com") {
+      {
+        return NextResponse.json(
+          {
+            message:
+              "Unauthorized - only admin users are allowed to approve carbon credits",
+          },
+          { status: 401 }
+        );
+      }
+    }
+
+    const { tokenId, action } = await req.json();
+    if (!tokenId) {
+      return NextResponse.json(
+        { message: "Token ID is required" },
+        { status: 400 }
+      );
+    }
+
+    if (action !== "approve") {
+      return NextResponse.json({ message: "Invalid action" }, { status: 400 });
+    }
+
+    const walletResponse = await client.listWallets({
+      userToken: session.user.userToken as string,
+    });
+
+    const walletId = walletResponse.data?.wallets.find(
+      (wallet) => wallet.blockchain === "ETH-SEPOLIA"
+    )?.id;
+
+    if (!walletId) {
+      return NextResponse.json(
+        { message: "No wallet found for blockchain: ETH-SEPOLIA" },
+        { status: 400 }
+      );
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.CIRCLE_BASE_URL}w3s/user/transactions/contractExecution`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${process.env.CIRCLE_API_KEY}`,
+            "X-User-Token": session.user.userToken as string,
+          },
+          body: JSON.stringify({
+            entitySecretCiphertext: CIRCLE_ENTITY_CIPHERTEXT,
+            contractAddress: CARBON_CREDIT_SWAP_CONTRACT_ADDRESS,
+            abiFunctionSignature: "approve(address,uint256)",
+            abiParameters: [
+              CARBON_CREDIT_SWAP_CONTRACT_ADDRESS,
+              tokenId.toString(),
+            ],
+            idempotencyKey: crypto.randomUUID(),
+            walletId: walletId,
+            feeLevel: "HIGH",
+          }),
+        }
+      );
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Approval initiation error:", errorText);
+        throw new Error(`Failed to initiate approval: ${errorText}`);
+      }
+
+      const responseText = await response.text();
+      console.log("Raw Response:", responseText);
+      const responseBody = JSON.parse(responseText);
+
+      return NextResponse.json({
+        message: "Approval transaction initiated",
+        challengeId: responseBody.data.challengeId,
+      });
+    } catch (error) {
+      console.error("Approval error:", error);
+      return NextResponse.json(
+        {
+          message: "Failed to initiate approval",
+          error: error instanceof Error ? error.message : String(error),
+        },
+        { status: 500 }
+      );
+    }
+  } catch (error) {
+    console.error("Error in approval route:", error);
+    return NextResponse.json(
+      { message: "Internal server error" },
       { status: 500 }
     );
   }

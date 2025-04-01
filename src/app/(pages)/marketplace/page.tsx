@@ -66,11 +66,6 @@ export default function Marketplace() {
                 price={credit.metadata.price}
                 isVerified={credit.metadata.isVerified}
                 isLoading={loading}
-                showPurchaseButton={
-                  session?.user?.email !== "admin@carboncredit.com"
-                    ? true
-                    : false
-                }
               />
             </div>
           ))}

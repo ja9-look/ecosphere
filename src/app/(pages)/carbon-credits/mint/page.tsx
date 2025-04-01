@@ -137,10 +137,7 @@ export default function MintPage() {
       }
 
       const { id: metadataId } = await metadataResponse.json();
-      const baseUrl =
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:3000"
-          : "https://your-production-url.com"; // update to deployed url when ready
+      const baseUrl = process.env.NEXTAUTH_URL;
       const metadataURI = `${baseUrl}/api/metadata/${metadataId}`;
 
       const mintResponse = await fetch("/api/carbon-credits/mint", {

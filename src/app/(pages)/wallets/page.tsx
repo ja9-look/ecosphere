@@ -15,7 +15,7 @@ export default function wallets() {
   const [wallets, setWallets] = useState<WalletCardProps[]>([]);
 
   useEffect(() => {
-    if (status === "unauthenticated" || !session?.user.userToken) {
+    if (status === "unauthenticated") {
       redirect("/marketplace");
     }
 

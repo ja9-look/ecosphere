@@ -6,48 +6,108 @@ import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
 import { CircularProgress } from "@mui/material";
 import { Button, Sheet } from "@mui/joy";
-import CarbonCreditCard, {
-  CarbonCreditCardProps,
-} from "../../../components/carbon-credits/CarbonCreditCard";
+import CarbonCreditCard from "../../../components/carbon-credits/CarbonCreditCard";
 import { CarbonCredit } from "../../../types/types";
+import { useW3sContext } from "../../../providers/W3sProvider";
 
 export default function CarbonCredits() {
   const { data: session, status } = useSession();
   const [loading, setLoading] = useState(false);
   const [carbonCredits, setCarbonCredits] = useState<CarbonCredit[]>([]);
+  const { client, isInitialized } = useW3sContext();
+  const [approvingId, setApprovingId] = useState<string | null>(null);
+  const [approvalStatus, setApprovalStatus] = useState<{
+    [key: string]: string;
+  }>({});
 
   useEffect(() => {
-    if (status === "unauthenticated" || !session?.user) {
+    if (status === "unauthenticated") {
       redirect("/");
-      return;
     }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-
-        const response = await fetch("/api/carbon-credits");
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch carbon credits");
-        }
-        const data = await response.json();
-        setCarbonCredits(data.carbonCredits);
-      } catch (error) {
-        console.error("Error fetching carbon credits:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    if (status === "authenticated") {
+      fetchData();
+    }
   }, [session, status]);
 
-  console.log("PAGE - carbon credits: ", carbonCredits);
-  console.log(session?.user.email);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch("/api/carbon-credits");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch carbon credits");
+      }
+      const data = await response.json();
+      setCarbonCredits(data.carbonCredits);
+    } catch (error) {
+      console.error("Error fetching carbon credits:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApproveNFT = async (tokenId: string) => {
+    try {
+      setApprovingId(tokenId);
+      setApprovalStatus((prev) => ({ ...prev, [tokenId]: "pending" }));
+
+      const response = await fetch("/api/carbon-credits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tokenId,
+          action: "approve",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to initiate approval");
+      }
+
+      const data = await response.json();
+      console.log("Approval initiated:", data);
+
+      if (
+        data.challengeId &&
+        client &&
+        session?.user.userToken &&
+        session?.user.encryptionKey
+      ) {
+        await client.setAuthentication({
+          userToken: session.user.userToken,
+          encryptionKey: session.user.encryptionKey,
+        });
+
+        console.log("Challenge ID:", data.challengeId);
+
+        await client.execute(data.challengeId, async (error, result) => {
+          if (error) {
+            console.error("Challenge execution error:", error);
+            setApprovalStatus((prev) => ({ ...prev, [tokenId]: "failed" }));
+            return;
+          }
+
+          if (result) {
+
+            console.log("Approval successful:", result);
+            setApprovalStatus((prev) => ({ ...prev, [tokenId]: "success" }));
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error approving NFT:", error);
+      setApprovalStatus((prev) => ({ ...prev, [tokenId]: "failed" }));
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
   return (
     <div>
       <Navbar />
-
       <Sheet
         sx={{
           display: "flex",
@@ -89,6 +149,9 @@ export default function CarbonCredits() {
                 price={credit.metadata.price}
                 isVerified={credit.metadata.isVerified}
                 isLoading={loading}
+                onApprove={handleApproveNFT}
+                approvingId={approvingId}
+                approvalStatus={approvalStatus}
               />
             </div>
           ))}
