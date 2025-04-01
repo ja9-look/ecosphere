@@ -24,7 +24,6 @@ export function W3sProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === "undefined" || client) return;
 
-    console.log("app id: ", process.env.NEXT_PUBLIC_CIRCLE_APP_ID);
     try {
       const sdk = new W3SSdk({
         appSettings: {

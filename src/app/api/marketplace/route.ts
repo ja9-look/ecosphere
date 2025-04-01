@@ -61,7 +61,6 @@ export async function GET(req: NextRequest) {
       const metadataRecord = await prisma.metadata.findUnique({
         where: { id: metadataId },
       });
-      //   console.log("metadataRecord: ", metadataRecord);
 
       if (!metadataRecord) {
         console.error(`No metadata found for ID: ${metadataId}`);
@@ -86,10 +85,8 @@ export async function GET(req: NextRequest) {
         owner,
       });
     }
-    console.log("carbonCredits: ", carbonCredits);
     return NextResponse.json({ carbonCredits }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching carbon credits:", error);
     return NextResponse.json(
       { message: "Failed to fetch carbon credits" },
       { status: 500 }

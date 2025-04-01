@@ -33,7 +33,6 @@ export async function GET(req: NextRequest) {
           userToken: session.user.userToken as string,
         });
 
-        console.log("balanceResponse:", balanceResponse.data);
         const tokenBalance = balanceResponse.data?.tokenBalances?.find(
           (token) =>
             blockchain === "AVAX-FUJI"

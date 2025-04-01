@@ -45,7 +45,6 @@ export default function Purchase() {
       );
 
       const swapData = await detailsResponse.json();
-      console.log("Swap data:", swapData);
       setSwapDetails(swapData);
 
       const executeResponse = await fetch(
@@ -63,9 +62,7 @@ export default function Purchase() {
         }
       );
 
-      console.log("Execute response status:", executeResponse.status);
       const executeData = await executeResponse.json();
-      console.log("Execute response data:", executeData);
       if (
         executeData.challengeId &&
         client &&
@@ -77,7 +74,6 @@ export default function Purchase() {
           encryptionKey: session.user.encryptionKey,
         });
 
-        console.log("Challenge ID:", executeData.challengeId);
         await client?.execute(
           executeData.challengeId,
           async (error, result) => {
@@ -87,16 +83,12 @@ export default function Purchase() {
             }
 
             if (result) {
-              console.log("Swap executed successfully:", result);
-              const status = result.status;
-              console.log("Transaction Hash:", status);
               redirect("/carbon-credits");
             }
           }
         );
       }
     } catch (error) {
-      console.error("Swap error:", error);
       setError("Failed to complete swap");
     } finally {
       setLoading(false);

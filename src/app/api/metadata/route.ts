@@ -5,8 +5,6 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
 
-    console.log("Metadata POST Received data:", data);
-
     const metadata = await prisma.metadata.create({
       data: {
         id: data.id,

@@ -51,8 +51,6 @@ export async function GET(req: Request) {
       userToken: session.user.userToken as string,
     });
 
-    console.log("nftbalanceResponse:", nftBalanceResponse.data);
-
     const nfts = nftBalanceResponse.data?.nfts || [];
     if (nfts.length === 0) {
       return NextResponse.json({ message: "No NFTs found" }, { status: 404 });
@@ -85,8 +83,6 @@ export async function GET(req: Request) {
 
     const allResults = await Promise.all(carbonCreditsPromises);
     const carbonCredits = allResults.filter((credit) => credit !== null);
-
-    console.log("filtered carbon credits: ", carbonCredits);
 
     return NextResponse.json({ carbonCredits }, { status: 200 });
   } catch (error) {
@@ -175,7 +171,6 @@ export async function POST(req: Request) {
       }
 
       const responseText = await response.text();
-      console.log("Raw Response:", responseText);
       const responseBody = JSON.parse(responseText);
 
       return NextResponse.json({
@@ -183,7 +178,6 @@ export async function POST(req: Request) {
         challengeId: responseBody.data.challengeId,
       });
     } catch (error) {
-      console.error("Approval error:", error);
       return NextResponse.json(
         {
           message: "Failed to initiate approval",
@@ -193,7 +187,6 @@ export async function POST(req: Request) {
       );
     }
   } catch (error) {
-    console.error("Error in approval route:", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }

@@ -5,6 +5,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { initiateUserControlledWalletsClient } from "@circle-fin/user-controlled-wallets";
 import bcrypt from "bcrypt";
 import prisma from "./prisma";
+import { NextResponse } from "next/server";
 
 const client = initiateUserControlledWalletsClient({
   apiKey: process.env.CIRCLE_API_KEY || "",
@@ -71,16 +72,16 @@ export const authOptions: NextAuthOptions = {
           });
 
           return {
-            id: user.id,
-            userId: user.circleUserId,
-            email: user.email,
+            id: user.id as string,
+            userId: user.circleUserId as string,
+            email: user.email as string,
             userToken,
             encryptionKey,
             challengeId,
           };
         } catch (error: any) {
-          console.error("Circle integration error:", error);
-          throw new Error(error.message || "An error occurred during sign up");
+          console.error(error.message);
+          return null;
         }
       },
     }),
@@ -136,17 +137,17 @@ export const authOptions: NextAuthOptions = {
           }
 
           return {
-            id: user.id,
-            userId: user.circleUserId,
-            email: user.email,
+            id: user.id as string,
+            userId: user.circleUserId as string,
+            email: user.email as string,
             userToken,
             encryptionKey,
             challengeId,
             pinStatus,
           };
         } catch (error: any) {
-          console.error("Circle integration error:", error);
-          throw new Error(error.message || "An error occurred during sign in");
+          console.error(error.message);
+          return null;
         }
       },
     }),

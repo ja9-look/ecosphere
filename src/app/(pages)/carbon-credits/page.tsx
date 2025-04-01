@@ -68,7 +68,6 @@ export default function CarbonCredits() {
       }
 
       const data = await response.json();
-      console.log("Approval initiated:", data);
 
       if (
         data.challengeId &&
@@ -81,8 +80,6 @@ export default function CarbonCredits() {
           encryptionKey: session.user.encryptionKey,
         });
 
-        console.log("Challenge ID:", data.challengeId);
-
         await client.execute(data.challengeId, async (error, result) => {
           if (error) {
             console.error("Challenge execution error:", error);
@@ -91,14 +88,11 @@ export default function CarbonCredits() {
           }
 
           if (result) {
-
-            console.log("Approval successful:", result);
             setApprovalStatus((prev) => ({ ...prev, [tokenId]: "success" }));
           }
         });
       }
     } catch (error) {
-      console.error("Error approving NFT:", error);
       setApprovalStatus((prev) => ({ ...prev, [tokenId]: "failed" }));
     } finally {
       setApprovingId(null);

@@ -16,9 +16,6 @@ const developerSdk = initiateDeveloperControlledWalletsClient({
   entitySecret: process.env.CIRCLE_ENTITY_SECRET || "",
 });
 
-console.log("CIRCLE_API_KEY: ", process.env.CIRCLE_API_KEY);
-console.log("CIRCLE_ENTITY_SECRET: ", process.env.CIRCLE_ENTITY_SECRET);
-
 const carbonCreditContractAddress =
   process.env.CARBON_CREDIT_CIRCLE_CONTRACT_ADDRESS;
 
@@ -71,13 +68,6 @@ export async function POST(req: Request) {
     )?.address;
 
     const tokenId = Math.floor(Date.now() / 1000);
-    console.log("userToken:", session.user.userToken);
-    console.log("Wallet Address:", walletAddress);
-    console.log("Metadata URI:", metadataURI);
-    console.log("Contract Address:", carbonCreditContractAddress);
-    console.log("wallet ID:", walletId);
-    console.log("amount: ", amount);
-    console.log("sesion token: ", session.user.userToken);
 
     const mintResponse = await developerSdk.createContractExecutionTransaction({
       walletId: process.env.ECOSPHERE_WALLET_ID as string,
@@ -93,7 +83,6 @@ export async function POST(req: Request) {
     });
 
     if (!mintResponse.data) {
-      console.error("Failed to create transaction:", mintResponse);
       return NextResponse.json(
         { message: "Failed to create transaction" },
         { status: 500 }
@@ -102,9 +91,6 @@ export async function POST(req: Request) {
 
     const transactionId = mintResponse.data.id;
     const state = mintResponse.data.state;
-
-    console.log("Transaction ID:", transactionId);
-    console.log("Transaction Status:", state);
 
     const carbonCredit = {
       tokenId,
@@ -120,13 +106,11 @@ export async function POST(req: Request) {
       status: "pending",
     };
 
-    console.log("carbonCredit:", carbonCredit);
     return NextResponse.json(
       { transactionId, state, carbonCredit },
       { status: 200 }
     );
   } catch (error: any) {
-    console.error("Error minting carbon credits:", error);
     return NextResponse.json({ message: error.message }, { status: 500 });
   }
 }

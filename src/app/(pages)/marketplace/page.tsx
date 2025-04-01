@@ -37,7 +37,6 @@ export default function Marketplace() {
     fetchData();
   }, [session, status]);
 
-  console.log("Marketplace - carbon credits: ", carbonCredits);
   return (
     <div>
       <Navbar />

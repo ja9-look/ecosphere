@@ -53,15 +53,6 @@ export async function POST(
         { status: 400 }
       );
     }
-
-    console.log(
-      "Full Wallets Response:",
-      JSON.stringify(wallets.data, null, 2)
-    );
-    console.log("Wallet ID:", walletId);
-    console.log("User Token:", session.user.userToken);
-    console.log("Entity Secret Ciphertext:", !!ENTITY_SECRET_CIPHERTEXT);
-
     const carbonCreditContract = new ethers.Contract(
       CARBON_CREDIT_CIRCLE_CONTRACT_ADDRESS as string,
       CARBON_CREDIT_ABI,
@@ -73,7 +64,6 @@ export async function POST(
       try {
         sellerAddress = await carbonCreditContract.ownerOf(id);
       } catch (error) {
-        console.error("Error fetching seller address: ", error);
         return NextResponse.json(
           { message: "Error fetching seller address" },
           { status: 500 }
@@ -118,7 +108,6 @@ export async function POST(
           }),
         };
 
-        console.log("request body: ", options.body);
         const response = await fetch(
           `${process.env.CIRCLE_BASE_URL}w3s/user/transactions/contractExecution`,
           {
@@ -142,28 +131,33 @@ export async function POST(
 
         if (!response.ok) {
           const errorText = await response.text();
-          console.error("Swap initiation error:", errorText);
-          throw new Error(`Failed to initiate swap: ${errorText}`);
+          return NextResponse.json(
+            {
+              message: "Failed to initiate swap",
+              error: errorText,
+            },
+            { status: response.status }
+          );
         }
 
         const responseText = await response.text();
-        console.log("Raw Response:", responseText);
 
         if (!response.ok) {
-          throw new Error(
-            `HTTP error! status: ${response.status}, body: ${responseText}`
+          return NextResponse.json(
+            {
+              message: "Failed to initiate swap",
+              error: responseText,
+            },
+            { status: response.status }
           );
         }
 
         const responseBody = JSON.parse(responseText);
-        console.log("Full Circle API Response:", responseBody);
-        console.log(responseBody.data.challengeId);
         return NextResponse.json({
           message: "Swap transaction initiated",
           challengeId: responseBody.data.challengeId,
         });
       } catch (error) {
-        console.error("Swap execution error:", error);
         return NextResponse.json(
           {
             message: "Failed to execute swap",
@@ -176,7 +170,6 @@ export async function POST(
 
     return NextResponse.json({ message: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error("Error in purchase route: ", error);
     return NextResponse.json(
       { message: "Internal server error" },
       { status: 500 }
