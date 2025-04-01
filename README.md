@@ -13,7 +13,7 @@ The Carbon Credit Marketplace allows:
 
 ## Architecture
 
-![Carbon Credit Marketplace Architecture](./public/architecture-diagram.png)
+![Carbon Credit Marketplace Architecture](./public/final-architectural-diagram.png)
 
 The application consists of several key components:
 
