@@ -63,7 +63,7 @@ ALCHEMY_API_KEY=                        # From Alchemy dashboard
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/carbon-credit-marketplace.git
+   git clone https://github.com/ja9-look/carbon-credit-marketplace.git
    cd carbon-credit-marketplace
    ```
 
