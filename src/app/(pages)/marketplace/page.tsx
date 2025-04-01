@@ -17,7 +17,6 @@ export default function Marketplace() {
   useEffect(() => {
     if (status === "unauthenticated") {
       redirect("/");
-      return;
     }
 
     const fetchData = async () => {
@@ -55,7 +54,7 @@ export default function Marketplace() {
       >
         {loading && <CircularProgress size={20} />}
         {carbonCredits.length > 0 &&
-          [...carbonCredits].map((credit) => (
+          [...carbonCredits].reverse().map((credit) => (
             <div key={credit.tokenId}>
               <CarbonCreditCard
                 id={credit.tokenId}
@@ -67,7 +66,11 @@ export default function Marketplace() {
                 price={credit.metadata.price}
                 isVerified={credit.metadata.isVerified}
                 isLoading={loading}
-                showPurchaseButton={true}
+                showPurchaseButton={
+                  session?.user?.email !== "admin@carboncredit.com"
+                    ? true
+                    : false
+                }
               />
             </div>
           ))}

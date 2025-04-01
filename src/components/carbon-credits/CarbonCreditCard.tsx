@@ -38,7 +38,7 @@ export default function CarbonCreditCard({
     <Card
       sx={{
         width: 400,
-        height: showPurchaseButton ? 300 : 2500,
+        height: showPurchaseButton ? 300 : 250,
         marginBottom: 2,
       }}
     >
@@ -80,9 +80,10 @@ export default function CarbonCreditCard({
           <>
             <br />
             <Button
+              style={{ float: "right" }}
               variant="contained"
-              color="secondary"
-              onClick={() => redirect(`/carbon-credit/${id}/purchase`)}
+              color="success"
+              onClick={() => redirect(`/carbon-credits/${id}/purchase`)}
             >
               Purchase
             </Button>

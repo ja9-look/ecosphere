@@ -32,11 +32,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    console.log("In the GET marketplace route");
     const provider = new ethers.JsonRpcProvider(
       `${process.env.RPC_URL_SEPOLIA}${process.env.ALCHEMY_API_KEY}`
     );
-    // console.log("provider: ", provider);
 
     const carbonCreditContract = new ethers.Contract(
       carbonCreditContractAddress as string,
