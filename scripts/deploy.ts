@@ -4,7 +4,7 @@ import * as path from "path";
 import "dotenv/config";
 
 async function main() {
-  console.log("Deploying Carbon Credit Marketplace contracts...");
+  console.log("Deploying Carbon Credit Swap contract...");
   const [deployer] = await ethers.getSigners();
   const deployerAddress = await deployer.getAddress();
   console.log(`Deploying contracts with account: ${deployerAddress}`);
@@ -14,10 +14,11 @@ async function main() {
 
   const defaultTokenAddresses: { [key: string]: string } = {
     localhost: "",
-    sepolia: process.env.USDC_ADDRESS_SEPOLIA || "",
-    fuji: process.env.USDC_ADDRESS_FUJI || "",
+    sepolia: process.env.USDC_SEPOLIA_CONTRACT_ADDRESS || "",
   };
 
+  let carbonCreditAddress =
+    process.env.CARBON_CREDIT_CIRCLE_CONTRACT_ADDRESS || "";
   let usdcAddress = defaultTokenAddresses[network];
 
   let finalUsdcAddress: string;
@@ -35,31 +36,28 @@ async function main() {
     }
     finalUsdcAddress = usdcAddress;
     console.log(`Using existing USDC at: ${finalUsdcAddress}`);
+    if (!carbonCreditAddress) {
+      throw new Error("No carbon credit contract address provided");
+    }
+    console.log(
+      `Using existing Carbon Credit Circle contract at: ${carbonCreditAddress}`
+    );
   }
 
-  console.log("Deploying CarbonCredit...");
-  const CarbonCredit = await ethers.getContractFactory("CarbonCredit");
-  const carbonCreditFactory = CarbonCredit.connect(deployer);
-  const carbonCredit = await carbonCreditFactory.deploy(finalUsdcAddress);
-  const carbonCreditAddress = await carbonCredit.getAddress();
-  console.log(`CarbonCredit deployed to: ${carbonCreditAddress}`);
-
-  console.log("Deploying CarbonMarketplace...");
-  const CarbonMarketplace = await ethers.getContractFactory(
-    "CarbonMarketplace"
-  );
-  const carbonMarketplaceFactory = CarbonMarketplace.connect(deployer);
-  const carbonMarketplace = await carbonMarketplaceFactory.deploy(
+  console.log("Deploying Carbon Credit Swap...");
+  const CarbonCreditSwap = await ethers.getContractFactory("CarbonCreditSwap");
+  const carbonCreditSwapFactory = CarbonCreditSwap.connect(deployer);
+  const carbonCreditSwap = await carbonCreditSwapFactory.deploy(
     carbonCreditAddress,
     finalUsdcAddress
   );
-  const carbonMarketplaceAddress = await carbonMarketplace.getAddress();
-  console.log(`CarbonMarketplace deployed to: ${carbonMarketplaceAddress}`);
+  const carbonCreditSwapAddress = await carbonCreditSwap.getAddress();
+  console.log(`Carbon Credit Swap deployed to: ${carbonCreditSwapAddress}`);
 
   const contractAddresses = {
+    carbonCreditNFT: carbonCreditAddress,
     usdc: finalUsdcAddress,
-    carbonCredit: carbonCreditAddress,
-    carbonMarketplace: carbonMarketplaceAddress,
+    atomicSwap: carbonCreditSwapAddress,
   };
 
   const outputDir = path.join(__dirname, "..", "src", "lib", "blockchain");
@@ -89,22 +87,15 @@ async function main() {
     );
   }
 
-  const carbonCreditAbi =
-    require("../artifacts/contracts/CarbonCredit.sol/CarbonCredit.json").abi;
-  const carbonMarketplaceAbi =
-    require("../artifacts/contracts/CarbonMarketplace.sol/CarbonMarketplace.json").abi;
+  const carbonCreditSwapAbi =
+    require("../artifacts/contracts/CarbonCreditSwap.sol/CarbonCreditSwap.json").abi;
 
   fs.writeFileSync(
-    path.join(abiDir, "CarbonCredit.json"),
-    JSON.stringify(carbonCreditAbi, null, 2)
+    path.join(abiDir, "CarbonCreditSwap.json"),
+    JSON.stringify(carbonCreditSwapAbi, null, 2)
   );
 
-  fs.writeFileSync(
-    path.join(abiDir, "CarbonMarketplace.json"),
-    JSON.stringify(carbonMarketplaceAbi, null, 2)
-  );
-
-  console.log(`ABIs exported to src/lib/blockchain/abis/`);
+  console.log(`ABI exported to src/lib/blockchain/abis/`);
 }
 
 main()

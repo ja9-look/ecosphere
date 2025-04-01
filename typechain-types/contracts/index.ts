@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { CarbonCredit } from "./CarbonCredit";
+export type { CarbonCreditSwap } from "./CarbonCreditSwap";
 export type { CarbonMarketplace } from "./CarbonMarketplace";
 export type { Lock } from "./Lock";
 export type { MockUSDC } from "./MockUSDC";

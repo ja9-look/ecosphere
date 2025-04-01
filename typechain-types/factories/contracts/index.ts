@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export { CarbonCredit__factory } from "./CarbonCredit__factory";
+export { CarbonCreditSwap__factory } from "./CarbonCreditSwap__factory";
 export { CarbonMarketplace__factory } from "./CarbonMarketplace__factory";
 export { Lock__factory } from "./Lock__factory";
 export { MockUSDC__factory } from "./MockUSDC__factory";
