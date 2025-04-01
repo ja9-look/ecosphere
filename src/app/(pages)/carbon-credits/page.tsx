@@ -9,6 +9,7 @@ import { Button, Sheet } from "@mui/joy";
 import CarbonCreditCard from "../../../components/carbon-credits/CarbonCreditCard";
 import { CarbonCredit } from "../../../types/types";
 import { useW3sContext } from "../../../providers/W3sProvider";
+import { NextResponse } from "next/server";
 
 export default function CarbonCredits() {
   const { data: session, status } = useSession();
@@ -36,7 +37,10 @@ export default function CarbonCredits() {
       const response = await fetch("/api/carbon-credits");
 
       if (!response.ok) {
-        throw new Error("Failed to fetch carbon credits");
+        return NextResponse.json(
+          { error: "Failed to fetch carbon credits" },
+          { status: 500 }
+        );
       }
       const data = await response.json();
       setCarbonCredits(data.carbonCredits);
@@ -64,7 +68,8 @@ export default function CarbonCredits() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to initiate approval");
+        console.error("Failed to approve carbon credit");
+        return;
       }
 
       const data = await response.json();
