@@ -198,6 +198,29 @@ Common issues and their solutions:
 - **"NFT not approved for transfer"**: Admin must approve the NFT before it can be purchased
 - **PIN challenge doesn't appear**: Check user token validity and ensure proper Circle SDK initialization
 
+## ⚠️ Implementation Status
+
+### Work-in-Progress Features
+
+#### NFT Approval & Purchase Flow
+
+The NFT approval and purchase flow is currently a work-in-progress. While the code structure and API endpoints have been created, there may be issues with:
+
+- NFT approval transaction completion
+- Purchase transaction execution
+
+For this reason, please note that some functionalities in relation to these specific flows may not work end-to-end in the current version.
+
+### Next Steps for Implementation
+
+To complete these features, the following work is planned:
+
+- Finalizing the smart contract interaction for NFT approvals
+- Ensuring proper wallet address handling between NFT and swap contracts
+- Improving error handling for failed transactions
+- Adding transaction status tracking and notifications
+- Comprehensive testing of the entire flow
+
 ## Future Enhancements
 
 Potential improvements for the project:
