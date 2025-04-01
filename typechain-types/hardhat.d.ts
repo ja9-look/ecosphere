@@ -30,26 +30,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721Errors__factory>;
     getContractFactory(
-      name: "ERC1155",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC1155__factory>;
-    getContractFactory(
-      name: "IERC1155MetadataURI",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC1155MetadataURI__factory>;
-    getContractFactory(
-      name: "IERC1155",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC1155__factory>;
-    getContractFactory(
-      name: "IERC1155Receiver",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC1155Receiver__factory>;
-    getContractFactory(
-      name: "ERC1155Holder",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC1155Holder__factory>;
-    getContractFactory(
       name: "ERC20",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC20__factory>;
@@ -66,33 +46,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721__factory>;
     getContractFactory(
-      name: "ERC165",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC165__factory>;
-    getContractFactory(
       name: "IERC165",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
-    getContractFactory(
-      name: "SafeCast",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SafeCast__factory>;
     getContractFactory(
       name: "ReentrancyGuard",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ReentrancyGuard__factory>;
     getContractFactory(
-      name: "CarbonCredit",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CarbonCredit__factory>;
-    getContractFactory(
       name: "CarbonCreditSwap",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CarbonCreditSwap__factory>;
-    getContractFactory(
-      name: "CarbonMarketplace",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CarbonMarketplace__factory>;
     getContractFactory(
       name: "Lock",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -123,31 +87,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721Errors>;
     getContractAt(
-      name: "ERC1155",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC1155>;
-    getContractAt(
-      name: "IERC1155MetadataURI",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC1155MetadataURI>;
-    getContractAt(
-      name: "IERC1155",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC1155>;
-    getContractAt(
-      name: "IERC1155Receiver",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC1155Receiver>;
-    getContractAt(
-      name: "ERC1155Holder",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC1155Holder>;
-    getContractAt(
       name: "ERC20",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -168,40 +107,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721>;
     getContractAt(
-      name: "ERC165",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC165>;
-    getContractAt(
       name: "IERC165",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
-    getContractAt(
-      name: "SafeCast",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SafeCast>;
     getContractAt(
       name: "ReentrancyGuard",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ReentrancyGuard>;
     getContractAt(
-      name: "CarbonCredit",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CarbonCredit>;
-    getContractAt(
       name: "CarbonCreditSwap",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.CarbonCreditSwap>;
-    getContractAt(
-      name: "CarbonMarketplace",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CarbonMarketplace>;
     getContractAt(
       name: "Lock",
       address: string | ethers.Addressable,
@@ -230,26 +149,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC721Errors>;
     deployContract(
-      name: "ERC1155",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ERC1155>;
-    deployContract(
-      name: "IERC1155MetadataURI",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC1155MetadataURI>;
-    deployContract(
-      name: "IERC1155",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC1155>;
-    deployContract(
-      name: "IERC1155Receiver",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC1155Receiver>;
-    deployContract(
-      name: "ERC1155Holder",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ERC1155Holder>;
-    deployContract(
       name: "ERC20",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ERC20>;
@@ -266,33 +165,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC721>;
     deployContract(
-      name: "ERC165",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ERC165>;
-    deployContract(
       name: "IERC165",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC165>;
-    deployContract(
-      name: "SafeCast",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.SafeCast>;
     deployContract(
       name: "ReentrancyGuard",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
     deployContract(
-      name: "CarbonCredit",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CarbonCredit>;
-    deployContract(
       name: "CarbonCreditSwap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CarbonCreditSwap>;
-    deployContract(
-      name: "CarbonMarketplace",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CarbonMarketplace>;
     deployContract(
       name: "Lock",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -323,31 +206,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC721Errors>;
     deployContract(
-      name: "ERC1155",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ERC1155>;
-    deployContract(
-      name: "IERC1155MetadataURI",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC1155MetadataURI>;
-    deployContract(
-      name: "IERC1155",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC1155>;
-    deployContract(
-      name: "IERC1155Receiver",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IERC1155Receiver>;
-    deployContract(
-      name: "ERC1155Holder",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ERC1155Holder>;
-    deployContract(
       name: "ERC20",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -368,40 +226,20 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC721>;
     deployContract(
-      name: "ERC165",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.ERC165>;
-    deployContract(
       name: "IERC165",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC165>;
-    deployContract(
-      name: "SafeCast",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.SafeCast>;
     deployContract(
       name: "ReentrancyGuard",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ReentrancyGuard>;
     deployContract(
-      name: "CarbonCredit",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CarbonCredit>;
-    deployContract(
       name: "CarbonCreditSwap",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CarbonCreditSwap>;
-    deployContract(
-      name: "CarbonMarketplace",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CarbonMarketplace>;
     deployContract(
       name: "Lock",
       args: any[],
