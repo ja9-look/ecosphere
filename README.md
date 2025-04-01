@@ -103,6 +103,7 @@ This application requires a database for storing user information and carbon cre
 2. Create test users:
 
    <b>Admin user:</b> You'll need to manually create an admin account with email admin@carboncredit.com
+
    <b>Regular users:</b> Create test buyer accounts as needed (e.g. buyer@carboncredit.com)
 
 ## Getting Started
