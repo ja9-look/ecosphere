@@ -202,6 +202,11 @@ Common issues and their solutions:
 
 ### Work-in-Progress Features
 
+#### NFT Minting Flow
+
+- Current Implementation: NFTs must be created through the Circle Developer Console. The application supports browsing these pre-minted NFTs.
+- Future Enhancement: Direct in-app minting of NFTs is planned, which will allow admins to create new carbon credits directly through the user interface without requiring the Circle Developer Console.
+
 #### NFT Approval & Purchase Flow
 
 The NFT approval and purchase flow is currently a work-in-progress. While the code structure and API endpoints have been created, there may be issues with:
@@ -215,8 +220,8 @@ For this reason, please note that some functionalities in relation to these spec
 
 To complete these features, the following work is planned:
 
+- Implementing direct NFT minting within the application
 - Finalizing the smart contract interaction for NFT approvals
-- Ensuring proper wallet address handling between NFT and swap contracts
 - Improving error handling for failed transactions
 - Adding transaction status tracking and notifications
 - Comprehensive testing of the entire flow
